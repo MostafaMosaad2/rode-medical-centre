@@ -26,7 +26,7 @@ export default function ContactPage() {
           <article className="contact-card reveal">
             <h3>{t.contact.phoneWhatsapp}</h3>
             <p>
-              <span className="phone-rtl" dir="rtl">
+              <span className="num-ltr" dir="ltr">
                 {site.phoneDisplay}
               </span>
             </p>
@@ -40,7 +40,7 @@ export default function ContactPage() {
           <article className="contact-card reveal">
             <h3>{t.contact.phoneCallOnly}</h3>
             <p>
-              <span className="phone-rtl" dir="rtl">
+              <span className="num-ltr" dir="ltr">
                 {site.phoneCallOnlyDisplay}
               </span>
             </p>

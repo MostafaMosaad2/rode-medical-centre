@@ -1,12 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { offerCategories } from "@/lib/site";
 
 export function ServicesPreview() {
   const { t, locale } = useI18n();
-  const preview = offerCategories.slice(0, 2);
+  const preview = offerCategories.slice(0, 3);
   const currency = locale === "ar" ? "ريال" : "SAR";
 
   return (
@@ -15,52 +16,33 @@ export function ServicesPreview() {
         <h2>{t.home.servicesTitle}</h2>
         <p>{t.home.servicesSupport}</p>
       </div>
-      <div className="service-list" style={{ marginBottom: "2rem" }}>
-        {t.services.items.slice(0, 3).map((item, index) => (
+      <div className="offer-preview-grid">
+        {preview.map((category, index) => (
           <article
-            key={item.title}
-            className="service-row reveal"
-            style={{ animationDelay: `${0.08 * index}s` }}
-          >
-            <h3>{item.title}</h3>
-            <p>{item.body}</p>
-          </article>
-        ))}
-      </div>
-      <div className="offer-catalog">
-        {preview.map((category, catIndex) => (
-          <section
             key={category.id}
-            className="offer-category reveal"
-            style={{ animationDelay: `${0.04 * catIndex}s` }}
+            className="offer-preview reveal"
+            style={{ animationDelay: `${0.06 * index}s` }}
           >
-            <header className="offer-category__head">
-              <h3>{locale === "ar" ? category.titleAr : category.titleEn}</h3>
-              {(category.subtitleAr || category.subtitleEn) && (
-                <p>{locale === "ar" ? category.subtitleAr : category.subtitleEn}</p>
-              )}
-            </header>
-            <ul className="offer-items">
-              {category.items.slice(0, 4).map((item) => (
-                <li key={`${category.id}-${item.titleEn}`}>
-                  <div className="offer-item__text">
-                    <h4>{locale === "ar" ? item.titleAr : item.titleEn}</h4>
-                  </div>
-                  <div className="offer-price">
-                    {item.oldPrice ? (
-                      <span className="offer-price__old phone-rtl" dir="rtl">
-                        {item.oldPrice}
-                      </span>
-                    ) : null}
-                    <strong className="phone-rtl" dir="rtl">
-                      {item.price}
-                    </strong>
-                    <span>{currency}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
+            <Link href="/services" className="offer-preview__link">
+              <Image
+                src={category.image}
+                alt={locale === "ar" ? category.titleAr : category.titleEn}
+                width={640}
+                height={800}
+                className="offer-preview__image"
+                sizes="(max-width: 860px) 100vw, 33vw"
+              />
+              <div className="offer-preview__copy">
+                <h3>{locale === "ar" ? category.titleAr : category.titleEn}</h3>
+                <p>
+                  {locale === "ar" ? category.subtitleAr : category.subtitleEn}
+                </p>
+                <span className="offer-preview__from" dir="ltr">
+                  {category.items[0]?.price} {currency}+
+                </span>
+              </div>
+            </Link>
+          </article>
         ))}
       </div>
       <div className="section__cta reveal">

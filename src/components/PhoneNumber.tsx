@@ -7,7 +7,7 @@ type PhoneNumberProps = {
   children?: React.ReactNode;
 };
 
-/** Keeps digit order readable right-to-left in both AR and EN layouts. */
+/** Digits always left-to-right in both Arabic and English layouts. */
 export function PhoneNumber({
   display,
   tel,
@@ -17,7 +17,7 @@ export function PhoneNumber({
   return (
     <a href={`tel:${tel}`} className={className}>
       {children}
-      <span className="phone-rtl" dir="rtl">
+      <span className="num-ltr" dir="ltr">
         {display}
       </span>
     </a>
@@ -32,7 +32,7 @@ export function PhoneText({
   className?: string;
 }) {
   return (
-    <span className={className ? `phone-rtl ${className}` : "phone-rtl"} dir="rtl">
+    <span className={className ? `num-ltr ${className}` : "num-ltr"} dir="ltr">
       {display}
     </span>
   );
