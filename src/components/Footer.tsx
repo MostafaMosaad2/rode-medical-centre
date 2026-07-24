@@ -27,6 +27,7 @@ export function Footer() {
             <Link href="/services">{t.nav.services}</Link>
             <Link href="/about">{t.nav.about}</Link>
             <Link href="/contact">{t.nav.contact}</Link>
+            <Link href="/privacy">{t.footer.privacy}</Link>
           </div>
           <div>
             <h3>{t.contact.phone}</h3>

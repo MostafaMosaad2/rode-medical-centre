@@ -27,6 +27,12 @@ export function Header() {
     { href: "/contact", label: t.nav.contact },
   ];
 
+  const normalizePath = (value: string) => {
+    if (value.length > 1 && value.endsWith("/")) return value.slice(0, -1);
+    return value;
+  };
+  const currentPath = normalizePath(pathname);
+
   return (
     <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
       <div className="site-header__inner">
@@ -52,7 +58,9 @@ export function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className={pathname === link.href ? "is-active" : undefined}
+              className={
+                currentPath === normalizePath(link.href) ? "is-active" : undefined
+              }
             >
               {link.label}
             </Link>
@@ -90,7 +98,9 @@ export function Header() {
           <Link
             key={link.href}
             href={link.href}
-            className={pathname === link.href ? "is-active" : undefined}
+            className={
+              currentPath === normalizePath(link.href) ? "is-active" : undefined
+            }
           >
             {link.label}
           </Link>

@@ -6,7 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -64,6 +64,12 @@ type Dictionary = {
   footer: {
     explore: string;
     rights: string;
+    privacy: string;
+  };
+  privacy: {
+    title: string;
+    support: string;
+    sections: { heading: string; body: string }[];
   };
 };
 
@@ -156,6 +162,33 @@ const dictionaries: Record<Locale, Dictionary> = {
     footer: {
       explore: "استكشف",
       rights: "جميع الحقوق محفوظة",
+      privacy: "سياسة الخصوصية",
+    },
+    privacy: {
+      title: "سياسة الخصوصية",
+      support: "كيف يتعامل تطبيق وموقع مجمع رود الطبي مع معلوماتك.",
+      sections: [
+        {
+          heading: "ملخص",
+          body: "تطبيق مجمع رود الطبي يعرض معلومات العيادة والخدمات وطرق التواصل. لا نطلب إنشاء حساب، ولا نبيع بياناتك الشخصية.",
+        },
+        {
+          heading: "البيانات التي قد تُستخدم",
+          body: "قد يحفظ التطبيق تفضيل اللغة على جهازك فقط (localStorage). عند اتصالكم أو مراسلتنا عبر واتساب أو الهاتف، تُستخدم قنوات التواصل الخارجية وفق سياساتها.",
+        },
+        {
+          heading: "الروابط الخارجية",
+          body: "قد يفتح التطبيق خرائط جوجل أو واتساب أو Linktree. تلك الخدمات تخضع لسياسات الخصوصية الخاصة بها.",
+        },
+        {
+          heading: "الصحة والخصوصية",
+          body: "لا يجمع هذا التطبيق السجلات الطبية ولا يخزّن معلومات صحية حساسة داخل التطبيق.",
+        },
+        {
+          heading: "التواصل",
+          body: "للاستفسارات حول الخصوصية تواصلوا معنا على أرقام العيادة المنشورة في صفحة التواصل.",
+        },
+      ],
     },
   },
   en: {
@@ -246,6 +279,33 @@ const dictionaries: Record<Locale, Dictionary> = {
     footer: {
       explore: "Explore",
       rights: "All rights reserved",
+      privacy: "Privacy policy",
+    },
+    privacy: {
+      title: "Privacy policy",
+      support: "How the Rode Medical Centre app and website handle your information.",
+      sections: [
+        {
+          heading: "Overview",
+          body: "The Rode Medical Centre app shows clinic information, services, and contact options. We do not require an account and we do not sell personal data.",
+        },
+        {
+          heading: "Data that may be used",
+          body: "The app may store your language preference on your device only (localStorage). If you call or message us via phone or WhatsApp, those external channels follow their own policies.",
+        },
+        {
+          heading: "External links",
+          body: "The app may open Google Maps, WhatsApp, or Linktree. Those services are governed by their own privacy policies.",
+        },
+        {
+          heading: "Health & privacy",
+          body: "This app does not collect medical records or store sensitive health information inside the app.",
+        },
+        {
+          heading: "Contact",
+          body: "For privacy questions, contact us using the clinic numbers listed on the Contact page.",
+        },
+      ],
     },
   },
 };
@@ -260,17 +320,47 @@ type I18nContextValue = {
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("ar");
+const LOCALE_KEY = "rcmc-locale";
+const localeListeners = new Set<() => void>();
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem("rcmc-locale");
-    if (saved === "ar" || saved === "en") setLocaleState(saved);
-  }, []);
+function readStoredLocale(): Locale {
+  try {
+    const saved = window.localStorage.getItem(LOCALE_KEY);
+    return saved === "ar" || saved === "en" ? saved : "ar";
+  } catch {
+    return "ar";
+  }
+}
+
+function subscribeLocale(listener: () => void) {
+  localeListeners.add(listener);
+  return () => {
+    localeListeners.delete(listener);
+  };
+}
+
+function getLocaleSnapshot() {
+  return readStoredLocale();
+}
+
+function getServerLocaleSnapshot(): Locale {
+  return "ar";
+}
+
+function writeLocale(next: Locale) {
+  window.localStorage.setItem(LOCALE_KEY, next);
+  localeListeners.forEach((listener) => listener());
+}
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const locale = useSyncExternalStore(
+    subscribeLocale,
+    getLocaleSnapshot,
+    getServerLocaleSnapshot,
+  );
 
   const setLocale = useCallback((next: Locale) => {
-    setLocaleState(next);
-    window.localStorage.setItem("rcmc-locale", next);
+    writeLocale(next);
     document.documentElement.lang = next;
     document.documentElement.dir = next === "ar" ? "rtl" : "ltr";
   }, []);

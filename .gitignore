@@ -20,6 +20,15 @@
 # production
 /build
 
+# Capacitor / Android local SDK + signing
+android/local.properties
+android/keystore.properties
+android/*.keystore
+android/*.jks
+android/.gradle/
+android/app/build/
+android/build/
+
 # misc
 .DS_Store
 *.pem
