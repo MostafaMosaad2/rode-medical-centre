@@ -1,3 +1,4 @@
+import { DoctorsPreview } from "@/components/DoctorsPreview";
 import { Hero } from "@/components/Hero";
 import { Reviews } from "@/components/Reviews";
 import { ServicesPreview } from "@/components/ServicesPreview";
@@ -8,6 +9,7 @@ export default function HomePage() {
     <>
       <Hero />
       <ServicesPreview />
+      <DoctorsPreview />
       <Reviews />
       <VisitCta />
     </>

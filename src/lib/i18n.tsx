@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  startTransition,
   useCallback,
   useContext,
   useEffect,
@@ -16,6 +17,7 @@ type Dictionary = {
   nav: {
     home: string;
     services: string;
+    doctors: string;
     about: string;
     contact: string;
   };
@@ -25,6 +27,7 @@ type Dictionary = {
     directions: string;
     book: string;
     viewServices: string;
+    viewDoctors: string;
   };
   home: {
     headline: string;
@@ -33,11 +36,23 @@ type Dictionary = {
     servicesEyebrow: string;
     servicesTitle: string;
     servicesSupport: string;
+    doctorsEyebrow: string;
+    doctorsTitle: string;
+    doctorsSupport: string;
     reviewsEyebrow: string;
     reviewsTitle: string;
     reviewsSupport: string;
     visitTitle: string;
     visitSupport: string;
+  };
+  doctors: {
+    title: string;
+    support: string;
+    credentials: string;
+    focus: string;
+    bookWith: string;
+    membersAr: string;
+    membersEn: string;
   };
   services: {
     title: string;
@@ -72,6 +87,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     nav: {
       home: "الرئيسية",
       services: "الخدمات",
+      doctors: "الأطباء",
       about: "من نحن",
       contact: "تواصل معنا",
     },
@@ -81,6 +97,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       directions: "الاتجاهات",
       book: "احجز استشارتك",
       viewServices: "استعرض الخدمات",
+      viewDoctors: "تعرّف على الأطباء",
     },
     home: {
       headline: "رعاية طبية وتجميلية موثوقة في المدينة المنورة",
@@ -90,11 +107,25 @@ const dictionaries: Record<Locale, Dictionary> = {
       servicesEyebrow: "التخصصات",
       servicesTitle: "خدماتنا",
       servicesSupport: "باقات وعروض واضحة لرعاية طبية وتجميلية بمعايير مهنية.",
+      doctorsEyebrow: "الفريق الطبي",
+      doctorsTitle: "أطباؤنا",
+      doctorsSupport:
+        "نخبة من الاستشاريين والأخصائيين بخبرات محلية وعالمية لرعاية أسرتكم.",
       reviewsEyebrow: "ثقة المرضى",
       reviewsTitle: "آراء المراجعين",
       reviewsSupport: "أكثر من تسعمائة تقييم من مرضى وعائلات في المدينة المنورة.",
       visitTitle: "زورونا في الراية",
       visitSupport: "موقع سهل الوصول في المدينة المنورة — احجزوا زيارتكم اليوم.",
+    },
+    doctors: {
+      title: "فريق الأطباء",
+      support:
+        "تعرّفوا على أطباء مجمع رود — مؤهلات واضحة، تخصصات متنوعة، وحجز مباشر عبر واتساب.",
+      credentials: "المؤهلات",
+      focus: "مجالات التركيز",
+      bookWith: "احجز مع الطبيب",
+      membersAr: "أطباء",
+      membersEn: "doctors",
     },
     services: {
       title: "خدمات وعروض مجمع رود",
@@ -132,13 +163,13 @@ const dictionaries: Record<Locale, Dictionary> = {
       support: "مجمع طبي شامل في قلب المدينة المنورة.",
       body: [
         "مجمع رود الشامل الطبي العام (Rode Medical Centre) مركز طبي موثوق يقدم خدمات طبية وتجميلية متكاملة للعائلات في المدينة المنورة.",
-        "نلتزم بجودة التجربة من الاستقبال حتى نهاية الجلسة، بفريق يُعرف بالمهارة والأمانة والاهتمام.",
-        "سواء احتجتم إلى رعاية أسنان، بشرة، فيلر، بوتكس، أو طب أطفال — هدفنا أن تغادروا وأنتم بأفضل حال.",
+        "نلتزم بجودة التجربة من الاستقبال حتى نهاية الجلسة، بفريق من الاستشاريين والأخصائيين يُعرف بالمهارة والأمانة والاهتمام.",
+        "سواء احتجتم إلى رعاية أسنان، نساء وتوليد، طب أطفال، بشرة، أو طب عام — هدفنا أن تغادروا وأنتم بأفضل حال.",
       ],
       highlightsTitle: "لماذا رود؟",
       highlights: [
         "تقييم 4.1 من أكثر من 929 مراجعة على خرائط جوجل",
-        "أطباء متخصصون وأجهزة معتمدة ونتائج طبيعية",
+        "فريق أطباء متخصصين بخبرات محلية وعالمية",
         "موقع سهل الوصول في حي الراية",
         "تواصل مباشر عبر الهاتف وواتساب",
       ],
@@ -162,6 +193,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     nav: {
       home: "Home",
       services: "Services",
+      doctors: "Doctors",
       about: "About",
       contact: "Contact",
     },
@@ -171,6 +203,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       directions: "Directions",
       book: "Book a visit",
       viewServices: "View services",
+      viewDoctors: "Meet our doctors",
     },
     home: {
       headline: "Trusted medical & aesthetic care in Madinah",
@@ -180,11 +213,25 @@ const dictionaries: Record<Locale, Dictionary> = {
       servicesEyebrow: "Specialties",
       servicesTitle: "Our services",
       servicesSupport: "Clear packages and offers for professional medical and aesthetic care.",
+      doctorsEyebrow: "Clinical team",
+      doctorsTitle: "Our doctors",
+      doctorsSupport:
+        "Consultants and specialists with local and international experience, ready to care for your family.",
       reviewsEyebrow: "Patient trust",
       reviewsTitle: "What patients say",
       reviewsSupport: "Over nine hundred reviews from families across Madinah.",
       visitTitle: "Visit us in Al Rayah",
       visitSupport: "Conveniently located in Madinah — book your visit today.",
+    },
+    doctors: {
+      title: "Our medical team",
+      support:
+        "Meet the Rode doctors — clear credentials, diverse specialties, and direct WhatsApp booking.",
+      credentials: "Credentials",
+      focus: "Focus areas",
+      bookWith: "Book with this doctor",
+      membersAr: "أطباء",
+      membersEn: "doctors",
     },
     services: {
       title: "Rode services & offers",
@@ -222,13 +269,13 @@ const dictionaries: Record<Locale, Dictionary> = {
       support: "A comprehensive medical centre in the heart of Madinah.",
       body: [
         "Rode Medical Centre (مجمع رود الشامل الطبي العام) is a trusted clinic offering medical and aesthetic services for families in Madinah.",
-        "We focus on the full visit — from reception to treatment — with a team known for skill, care, and integrity.",
-        "Whether you need dental care, skincare, filler, Botox, or pediatrics, our goal is for you to leave feeling better.",
+        "We focus on the full visit — from reception to treatment — with consultants and specialists known for skill, care, and integrity.",
+        "Whether you need dental care, obstetrics, pediatrics, skincare, or general medicine, our goal is for you to leave feeling better.",
       ],
       highlightsTitle: "Why Rode?",
       highlights: [
         "4.1 rating from 929+ Google reviews",
-        "Specialized doctors, certified devices, and natural results",
+        "Specialized doctors with local and international experience",
         "Convenient location in Al Rayah",
         "Direct booking by phone or WhatsApp",
       ],
@@ -265,7 +312,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = window.localStorage.getItem("rcmc-locale");
-    if (saved === "ar" || saved === "en") setLocaleState(saved);
+    if (saved === "ar" || saved === "en") {
+      startTransition(() => setLocaleState(saved));
+    }
   }, []);
 
   const setLocale = useCallback((next: Locale) => {
