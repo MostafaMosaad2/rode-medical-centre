@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PhoneNumber } from "@/components/PhoneNumber";
 import { useI18n } from "@/lib/i18n";
 import { site, whatsappUrl } from "@/lib/site";
 
@@ -58,9 +59,13 @@ export function Header() {
           >
             {locale === "ar" ? "EN" : "ع"}
           </button>
-          <a className="btn btn--ghost" href={`tel:${site.phoneTel}`}>
-            {t.cta.call}
-          </a>
+          <PhoneNumber
+            className="btn btn--ghost"
+            display={site.phoneDisplay}
+            tel={site.phoneTel}
+          >
+            <span className="sr-only">{t.cta.call} </span>
+          </PhoneNumber>
           <a
             className="btn btn--primary"
             href={whatsappUrl()}

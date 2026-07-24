@@ -1,5 +1,6 @@
 "use client";
 
+import { PhoneNumber } from "@/components/PhoneNumber";
 import { useI18n } from "@/lib/i18n";
 import { site, whatsappUrl } from "@/lib/site";
 
@@ -23,12 +24,32 @@ export default function ContactPage() {
             </a>
           </article>
           <article className="contact-card reveal">
-            <h3>{t.contact.phone}</h3>
-            <p>{site.phoneDisplay}</p>
-            <a href={`tel:${site.phoneTel}`}>{t.cta.call}</a>
+            <h3>{t.contact.phoneWhatsapp}</h3>
+            <p>
+              <span className="phone-rtl" dir="rtl">
+                {site.phoneDisplay}
+              </span>
+            </p>
+            <PhoneNumber display={site.phoneDisplay} tel={site.phoneTel}>
+              {t.cta.call}{" "}
+            </PhoneNumber>
             <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
               {t.cta.whatsapp}
             </a>
+          </article>
+          <article className="contact-card reveal">
+            <h3>{t.contact.phoneCallOnly}</h3>
+            <p>
+              <span className="phone-rtl" dir="rtl">
+                {site.phoneCallOnlyDisplay}
+              </span>
+            </p>
+            <PhoneNumber
+              display={site.phoneCallOnlyDisplay}
+              tel={site.phoneCallOnlyTel}
+            >
+              {t.cta.call}{" "}
+            </PhoneNumber>
           </article>
           <article className="contact-card reveal">
             <h3>{t.contact.hours}</h3>

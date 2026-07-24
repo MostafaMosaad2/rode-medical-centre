@@ -21,18 +21,19 @@ export const metadata: Metadata = {
     template: "%s | Rode Medical Centre",
   },
   description:
-    "Rode Medical Centre in Madinah — medical and aesthetic care including laser, skincare, and pediatrics. مجمع رود الشامل الطبي العام في المدينة المنورة.",
+    "Rode Medical Centre in Madinah — dental, skin, filler, Botox, and medical care. مجمع رود الشامل الطبي العام في المدينة المنورة.",
   openGraph: {
     title: "Rode Medical Centre | مجمع رود الطبي",
     description:
-      "Trusted medical & aesthetic care in Madinah. Laser, skin, pediatrics, and more.",
+      "Trusted medical & aesthetic care in Madinah. Dental, skin, filler, Botox, and more.",
     locale: "ar_SA",
     alternateLocale: ["en_US"],
     type: "website",
   },
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: [{ url: "/favicon.png", type: "image/png" }],
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
 };
 

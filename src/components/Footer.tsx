@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { PhoneNumber } from "@/components/PhoneNumber";
 import { useI18n } from "@/lib/i18n";
 import { site, whatsappUrl } from "@/lib/site";
 
@@ -29,7 +30,13 @@ export function Footer() {
           </div>
           <div>
             <h3>{t.contact.phone}</h3>
-            <a href={`tel:${site.phoneTel}`}>{site.phoneDisplay}</a>
+            <p className="footer-phone-label">{t.contact.phoneWhatsapp}</p>
+            <PhoneNumber display={site.phoneDisplay} tel={site.phoneTel} />
+            <p className="footer-phone-label">{t.contact.phoneCallOnly}</p>
+            <PhoneNumber
+              display={site.phoneCallOnlyDisplay}
+              tel={site.phoneCallOnlyTel}
+            />
             <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
               WhatsApp
             </a>

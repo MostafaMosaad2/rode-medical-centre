@@ -54,6 +54,8 @@ type Dictionary = {
     support: string;
     address: string;
     phone: string;
+    phoneWhatsapp: string;
+    phoneCallOnly: string;
     hours: string;
     social: string;
   };
@@ -90,32 +92,33 @@ const dictionaries: Record<Locale, Dictionary> = {
       visitSupport: "الراية، المدينة المنورة — نحن بانتظاركم.",
     },
     services: {
-      title: "خدمات مجمع رود",
-      support: "من الليزر والعناية بالبشرة إلى طب الأطفال والرعاية العامة.",
+      title: "خدمات وعروض مجمع رود",
+      support:
+        "أسنان، فيلر، بوتكس، تنظيف بشرة، تقشير ماسي، تخريم، وسونار — بأسعار واضحة.",
       items: [
         {
-          title: "الليزر والتجميل",
-          body: "جلسات ليزر معتمدة بتجربة مريحة وفريق متخصص.",
+          title: "الأسنان",
+          body: "تنظيف، تبييض، تركيبات، فينير، وخلع بأسعار تبدأ من عروضنا الحالية.",
         },
         {
-          title: "تنظيف وعناية البشرة",
-          body: "تنظيف عميق وعلاجات بشرة بأيدٍ خبيرة واهتمام بالتفاصيل.",
+          title: "الفيلر والبوتكس",
+          body: "عروض فيلر وبوتكس لنتائج طبيعية مع أطباء متخصصين وأجهزة معتمدة.",
         },
         {
-          title: "طب الأطفال",
-          body: "رعاية أطفال بخبرة واهتمام — من ضمنهم د. محمد ياسر بركات.",
+          title: "العناية بالبشرة",
+          body: "تنظيف بشرة، هيدرافيشل، وتقشير ماسي لمناطق الوجه والجسم.",
         },
         {
-          title: "العناية بالحواجب",
-          body: "خدمات دقيقة للحواجب بمظهر طبيعي ومتناسق.",
+          title: "التخريم",
+          body: "عروض تخريم للصديقات — الثاني بنصف السعر لفترة محدودة.",
         },
         {
-          title: "الرعاية الطبية العامة",
-          body: "استشارات ومتابعة طبية شاملة لأسرتكم في مكان واحد.",
+          title: "السونار والاستشارات",
+          body: "عروض خاصة مع الاستشارية د. رشا الأمين تشمل الكشف والسونار.",
         },
         {
-          title: "استقبال وخدمة المرضى",
-          body: "فريق استقبال متعاون يجعل زيارتكم أسهل منذ اللحظة الأولى.",
+          title: "طب الأطفال والرعاية العامة",
+          body: "رعاية أطفال وخدمات طبية شاملة للأسرة في مجمع واحد.",
         },
       ],
     },
@@ -125,12 +128,12 @@ const dictionaries: Record<Locale, Dictionary> = {
       body: [
         "مجمع رود الشامل الطبي العام (Rode Medical Centre) مركز طبي موثوق يقدم خدمات طبية وتجميلية متكاملة للعائلات في المدينة المنورة.",
         "نحرص على جودة التجربة من الاستقبال حتى نهاية الجلسة، مع فريق يُشاد به باستمرار لأخلاقه ومهارته وأمانته.",
-        "سواء كنتم تبحثون عن ليزر، عناية بشرة، أو رعاية أطفال — هدفنا أن تغادروا وأنتم بأفضل حال.",
+        "سواء كنتم تبحثون عن أسنان، بشرة، فيلر، بوتكس، أو رعاية أطفال — هدفنا أن تغادروا وأنتم بأفضل حال.",
       ],
       highlightsTitle: "لماذا رود؟",
       highlights: [
         "تقييم 4.1 من أكثر من 929 مراجعة",
-        "خدمات ليزر وبشرة وأطفال في مجمع واحد",
+        "أطباء متخصصون · أجهزة معتمدة · نتائج طبيعية",
         "موقع سهل الوصول في حي الراية",
         "تواجد على إنستغرام وتيك توك وسناب شات",
       ],
@@ -140,6 +143,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       support: "احجزوا أو استفسروا عبر الاتصال أو واتساب أو الزيارة.",
       address: "العنوان",
       phone: "الهاتف",
+      phoneWhatsapp: "اتصال وواتساب",
+      phoneCallOnly: "اتصال فقط",
       hours: "ساعات العمل",
       social: "تابعونا",
     },
@@ -174,32 +179,33 @@ const dictionaries: Record<Locale, Dictionary> = {
       visitSupport: "Al Rayah, Madinah — we look forward to welcoming you.",
     },
     services: {
-      title: "Rode services",
-      support: "From laser and skincare to pediatrics and general care.",
+      title: "Rode services & offers",
+      support:
+        "Dental, filler, Botox, facials, diamond peel, piercing, and ultrasound — with clear pricing.",
       items: [
         {
-          title: "Laser & aesthetics",
-          body: "Trusted laser sessions with a comfortable, specialist-led experience.",
+          title: "Dental",
+          body: "Cleaning, whitening, crowns, veneers, and extractions from our current offers.",
         },
         {
-          title: "Skin cleansing & care",
-          body: "Deep cleanses and skin treatments with careful, gentle technique.",
+          title: "Filler & Botox",
+          body: "Filler and Botox offers for natural results with specialized doctors.",
         },
         {
-          title: "Pediatrics",
-          body: "Experienced pediatric care — including Dr. Mohamed Yasser Barakat.",
+          title: "Skin care",
+          body: "Facials, Hydrafacial, and diamond peeling for face and body areas.",
         },
         {
-          title: "Brow care",
-          body: "Precise brow services for a natural, balanced look.",
+          title: "Piercing",
+          body: "Friends piercing offers — second piercing at half price for a limited time.",
         },
         {
-          title: "General medical care",
-          body: "Consultations and follow-up for the whole family in one place.",
+          title: "Ultrasound & consults",
+          body: "Special packages with Consultant Dr. Rasha Al-Amin including exam and ultrasound.",
         },
         {
-          title: "Patient experience",
-          body: "A cooperative reception team that makes every visit easier from the start.",
+          title: "Pediatrics & general care",
+          body: "Pediatric and family medical care under one roof.",
         },
       ],
     },
@@ -209,12 +215,12 @@ const dictionaries: Record<Locale, Dictionary> = {
       body: [
         "Rode Medical Centre (مجمع رود الشامل الطبي العام) is a trusted clinic offering medical and aesthetic services for families in Madinah.",
         "We focus on the full visit experience — from reception to treatment — with a team frequently praised for skill, care, and integrity.",
-        "Whether you need laser, skincare, or pediatric care, our goal is for you to leave feeling better.",
+        "Whether you need dental care, skincare, filler, Botox, or pediatrics, our goal is for you to leave feeling better.",
       ],
       highlightsTitle: "Why Rode?",
       highlights: [
         "4.1 rating from 929+ Google reviews",
-        "Laser, skin, and pediatric services under one roof",
+        "Specialized doctors · certified devices · natural results",
         "Convenient location in Al Rayah",
         "Active on Instagram, TikTok, and Snapchat",
       ],
@@ -224,6 +230,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       support: "Book or ask questions by phone, WhatsApp, or in person.",
       address: "Address",
       phone: "Phone",
+      phoneWhatsapp: "Call & WhatsApp",
+      phoneCallOnly: "Call only",
       hours: "Hours",
       social: "Follow us",
     },
