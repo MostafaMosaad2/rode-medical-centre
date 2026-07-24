@@ -46,6 +46,9 @@ export function OfferCatalog({ previewLimit }: { previewLimit?: number }) {
               className="offer-category__image"
               sizes="(max-width: 860px) 100vw, 420px"
             />
+            <div className="offer-category__badge">
+              <span>{locale === "ar" ? category.titleAr : category.titleEn}</span>
+            </div>
           </div>
           <div className="offer-category__body">
             <header className="offer-category__head">

@@ -8,7 +8,6 @@ import { offerCategories } from "@/lib/site";
 export function ServicesPreview() {
   const { t, locale } = useI18n();
   const preview = offerCategories.slice(0, 3);
-  const currency = locale === "ar" ? "ريال" : "SAR";
 
   return (
     <section className="section">
@@ -24,22 +23,24 @@ export function ServicesPreview() {
             style={{ animationDelay: `${0.06 * index}s` }}
           >
             <Link href="/services" className="offer-preview__link">
-              <Image
-                src={category.image}
-                alt={locale === "ar" ? category.titleAr : category.titleEn}
-                width={640}
-                height={800}
-                className="offer-preview__image"
-                sizes="(max-width: 860px) 100vw, 33vw"
-              />
+              <div className="offer-preview__media">
+                <Image
+                  src={category.image}
+                  alt={locale === "ar" ? category.titleAr : category.titleEn}
+                  width={640}
+                  height={800}
+                  className="offer-preview__image"
+                  sizes="(max-width: 860px) 100vw, 33vw"
+                />
+                <span className="offer-preview__badge">
+                  {locale === "ar" ? category.titleAr : category.titleEn}
+                </span>
+              </div>
               <div className="offer-preview__copy">
                 <h3>{locale === "ar" ? category.titleAr : category.titleEn}</h3>
                 <p>
                   {locale === "ar" ? category.subtitleAr : category.subtitleEn}
                 </p>
-                <span className="offer-preview__from" dir="ltr">
-                  {category.items[0]?.price} {currency}+
-                </span>
               </div>
             </Link>
           </article>

@@ -61,7 +61,7 @@ export const offerCategories: OfferCategory[] = [
     titleEn: "Dental offers",
     subtitleAr: "ابتسامتك تستحق الأفضل",
     subtitleEn: "Your smile deserves the best",
-    image: "/offers/dental.png",
+    image: "/offers/dental.jpg",
     items: [
       {
         titleAr: "كشف + تنظيف جير + تلميع الأسنان",
@@ -127,7 +127,7 @@ export const offerCategories: OfferCategory[] = [
     titleEn: "Weekend dental offer",
     subtitleAr: "الخميس والسبت",
     subtitleEn: "Thursday & Saturday",
-    image: "/offers/weekend-dental.png",
+    image: "/offers/weekend-dental.jpg",
     items: [
       {
         titleAr: "كشف + تنظيف + تلميع الأسنان",
@@ -149,7 +149,7 @@ export const offerCategories: OfferCategory[] = [
     titleEn: "Filler offers",
     subtitleAr: "إطلالة طبيعية .. ثقة تدوم",
     subtitleEn: "A natural look… lasting confidence",
-    image: "/offers/filler.png",
+    image: "/offers/filler.jpg",
     items: [
       { titleAr: "فيلر 1 مل", titleEn: "Filler 1 ml", price: "800" },
       { titleAr: "فيلر 2 مل", titleEn: "Filler 2 ml", price: "1500" },
@@ -162,7 +162,7 @@ export const offerCategories: OfferCategory[] = [
     titleEn: "Botox offers",
     subtitleAr: "جمالك يستحق الأفضل",
     subtitleEn: "Your beauty deserves the best",
-    image: "/offers/botox.png",
+    image: "/offers/botox.jpg",
     items: [
       {
         titleAr: "بوتكس جبهة وحول العين",
@@ -203,7 +203,7 @@ export const offerCategories: OfferCategory[] = [
     titleEn: "Skin cleaning",
     subtitleAr: "بالعناية التي تستحقينها",
     subtitleEn: "With the care you deserve",
-    image: "/offers/skin-cleaning.png",
+    image: "/offers/skin-cleaning.jpg",
     items: [
       {
         titleAr: "تنظيف بشرة عادي بالبخار",
@@ -243,7 +243,7 @@ export const offerCategories: OfferCategory[] = [
     titleEn: "Diamond peeling",
     subtitleAr: "أي منطقة بـ 99 ريال",
     subtitleEn: "Any area for 99 SAR",
-    image: "/offers/diamond-peel.png",
+    image: "/offers/diamond-peel.jpg",
     items: [
       {
         titleAr: "تقشير ماسي — أي منطقة",
@@ -281,7 +281,7 @@ export const offerCategories: OfferCategory[] = [
     titleEn: "Piercing offers for friends",
     subtitleAr: "اختاري التخريم الأول، وخذي الثاني بنصف السعر",
     subtitleEn: "First piercing full price — second at half price",
-    image: "/offers/piercing.png",
+    image: "/offers/piercing.jpg",
     items: [
       {
         titleAr: "تخريم الأذن",
@@ -333,7 +333,7 @@ export const offerCategories: OfferCategory[] = [
     titleEn: "Dr. Rasha Al-Amin ultrasound offers",
     subtitleAr: "عرض خاص لمدة أسبوع",
     subtitleEn: "Special offer for one week",
-    image: "/offers/ultrasound.png",
+    image: "/offers/ultrasound.jpg",
     items: [
       {
         titleAr: "الكشف + السونار + مراجعة",
