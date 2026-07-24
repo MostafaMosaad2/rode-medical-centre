@@ -1,6 +1,5 @@
 "use client";
 
-import { PhoneNumber } from "@/components/PhoneNumber";
 import { useI18n } from "@/lib/i18n";
 import { site, whatsappUrl } from "@/lib/site";
 
@@ -19,16 +18,14 @@ export function VisitCta() {
           {locale === "ar" ? site.hoursNoteAr : site.hoursNoteEn}
         </p>
         <div className="hero__actions">
-          <PhoneNumber
+          <a
             className="btn btn--primary btn--lg"
-            display={site.phoneDisplay}
-            tel={site.phoneTel}
-          />
-          <PhoneNumber
-            className="btn btn--ghost btn--lg"
-            display={site.phoneCallOnlyDisplay}
-            tel={site.phoneCallOnlyTel}
-          />
+            href={whatsappUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t.cta.book}
+          </a>
           <a
             className="btn btn--ghost btn--lg"
             href={site.mapsUrl}
@@ -37,13 +34,8 @@ export function VisitCta() {
           >
             {t.cta.directions}
           </a>
-          <a
-            className="btn btn--lime btn--lg"
-            href={whatsappUrl()}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t.cta.whatsapp}
+          <a className="btn btn--ghost btn--lg" href={`tel:${site.phoneTel}`}>
+            {t.cta.call}
           </a>
         </div>
       </div>

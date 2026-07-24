@@ -21,11 +21,11 @@ export const metadata: Metadata = {
     template: "%s | Rode Medical Centre",
   },
   description:
-    "Rode Medical Centre in Madinah — dental, skin, filler, Botox, and medical care. مجمع رود الشامل الطبي العام في المدينة المنورة.",
+    "Rode Medical Centre in Madinah — trusted dental, skin, filler, Botox, and family medical care. مجمع رود الشامل الطبي العام في المدينة المنورة.",
   openGraph: {
     title: "Rode Medical Centre | مجمع رود الطبي",
     description:
-      "Trusted medical & aesthetic care in Madinah. Dental, skin, filler, Botox, and more.",
+      "Trusted medical and aesthetic care in Madinah. Dental, skin, filler, Botox, and more.",
     locale: "ar_SA",
     alternateLocale: ["en_US"],
     type: "website",

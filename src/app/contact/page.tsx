@@ -10,6 +10,7 @@ export default function ContactPage() {
   return (
     <>
       <section className="page-hero reveal">
+        <p className="section__eyebrow">{t.nav.contact}</p>
         <h1>{t.contact.title}</h1>
         <p>{t.contact.support}</p>
       </section>

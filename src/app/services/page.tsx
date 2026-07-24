@@ -9,6 +9,7 @@ export default function ServicesPage() {
   return (
     <>
       <section className="page-hero reveal">
+        <p className="section__eyebrow">{t.home.servicesEyebrow}</p>
         <h1>{t.services.title}</h1>
         <p>{t.services.support}</p>
       </section>

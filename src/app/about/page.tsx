@@ -8,6 +8,7 @@ export default function AboutPage() {
   return (
     <>
       <section className="page-hero reveal">
+        <p className="section__eyebrow">Rode</p>
         <h1>{t.about.title}</h1>
         <p>{t.about.support}</p>
       </section>

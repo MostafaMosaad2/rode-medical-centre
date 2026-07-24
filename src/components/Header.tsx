@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { PhoneNumber } from "@/components/PhoneNumber";
 import { useI18n } from "@/lib/i18n";
 import { site, whatsappUrl } from "@/lib/site";
@@ -10,6 +11,14 @@ import { site, whatsappUrl } from "@/lib/site";
 export function Header() {
   const { t, locale, toggleLocale, dir } = useI18n();
   const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const links = [
     { href: "/", label: t.nav.home },
@@ -19,14 +28,14 @@ export function Header() {
   ];
 
   return (
-    <header className="site-header">
+    <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
       <div className="site-header__inner">
         <Link href="/" className="brand-mark" aria-label={site.nameEn}>
           <Image
             src="/logo.png"
             alt={site.nameEn}
-            width={56}
-            height={56}
+            width={52}
+            height={52}
             className="brand-mark__logo"
             priority
           />

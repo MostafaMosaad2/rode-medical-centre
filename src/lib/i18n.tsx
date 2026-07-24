@@ -30,8 +30,10 @@ type Dictionary = {
     headline: string;
     support: string;
     ratingLabel: string;
+    servicesEyebrow: string;
     servicesTitle: string;
     servicesSupport: string;
+    reviewsEyebrow: string;
     reviewsTitle: string;
     reviewsSupport: string;
     visitTitle: string;
@@ -60,6 +62,7 @@ type Dictionary = {
     social: string;
   };
   footer: {
+    explore: string;
     rights: string;
   };
 };
@@ -80,16 +83,18 @@ const dictionaries: Record<Locale, Dictionary> = {
       viewServices: "استعرض الخدمات",
     },
     home: {
-      headline: "رعاية طبية وتجميلية بثقة في المدينة المنورة",
+      headline: "رعاية طبية وتجميلية موثوقة في المدينة المنورة",
       support:
-        "مجمع رود الشامل الطبي العام — ليزر، بشرة، أطفال، وخدمات متخصصة بفريق متعاون.",
+        "مجمع رود الشامل الطبي العام — أسنان، بشرة، تجميل طبي، وطب أطفال تحت سقف واحد.",
       ratingLabel: "تقييم على خرائط جوجل",
+      servicesEyebrow: "التخصصات",
       servicesTitle: "خدماتنا",
-      servicesSupport: "عناية طبية وتجميلية مختارة بعناية لصحتكم وجمالكم.",
+      servicesSupport: "باقات وعروض واضحة لرعاية طبية وتجميلية بمعايير مهنية.",
+      reviewsEyebrow: "ثقة المرضى",
       reviewsTitle: "آراء المراجعين",
-      reviewsSupport: "أكثر من تسعمائة تقييم من مرضى وعائلات في المدينة.",
-      visitTitle: "زورونا",
-      visitSupport: "الراية، المدينة المنورة — نحن بانتظاركم.",
+      reviewsSupport: "أكثر من تسعمائة تقييم من مرضى وعائلات في المدينة المنورة.",
+      visitTitle: "زورونا في الراية",
+      visitSupport: "موقع سهل الوصول في المدينة المنورة — احجزوا زيارتكم اليوم.",
     },
     services: {
       title: "خدمات وعروض مجمع رود",
@@ -127,20 +132,20 @@ const dictionaries: Record<Locale, Dictionary> = {
       support: "مجمع طبي شامل في قلب المدينة المنورة.",
       body: [
         "مجمع رود الشامل الطبي العام (Rode Medical Centre) مركز طبي موثوق يقدم خدمات طبية وتجميلية متكاملة للعائلات في المدينة المنورة.",
-        "نحرص على جودة التجربة من الاستقبال حتى نهاية الجلسة، مع فريق يُشاد به باستمرار لأخلاقه ومهارته وأمانته.",
-        "سواء كنتم تبحثون عن أسنان، بشرة، فيلر، بوتكس، أو رعاية أطفال — هدفنا أن تغادروا وأنتم بأفضل حال.",
+        "نلتزم بجودة التجربة من الاستقبال حتى نهاية الجلسة، بفريق يُعرف بالمهارة والأمانة والاهتمام.",
+        "سواء احتجتم إلى رعاية أسنان، بشرة، فيلر، بوتكس، أو طب أطفال — هدفنا أن تغادروا وأنتم بأفضل حال.",
       ],
       highlightsTitle: "لماذا رود؟",
       highlights: [
-        "تقييم 4.1 من أكثر من 929 مراجعة",
-        "أطباء متخصصون · أجهزة معتمدة · نتائج طبيعية",
+        "تقييم 4.1 من أكثر من 929 مراجعة على خرائط جوجل",
+        "أطباء متخصصون وأجهزة معتمدة ونتائج طبيعية",
         "موقع سهل الوصول في حي الراية",
-        "تواجد على إنستغرام وتيك توك وسناب شات",
+        "تواصل مباشر عبر الهاتف وواتساب",
       ],
     },
     contact: {
       title: "تواصل معنا",
-      support: "احجزوا أو استفسروا عبر الاتصال أو واتساب أو الزيارة.",
+      support: "احجزوا موعدكم أو استفسروا عبر الاتصال أو واتساب أو بالزيارة.",
       address: "العنوان",
       phone: "الهاتف",
       phoneWhatsapp: "اتصال وواتساب",
@@ -149,6 +154,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       social: "تابعونا",
     },
     footer: {
+      explore: "استكشف",
       rights: "جميع الحقوق محفوظة",
     },
   },
@@ -167,16 +173,18 @@ const dictionaries: Record<Locale, Dictionary> = {
       viewServices: "View services",
     },
     home: {
-      headline: "Medical & aesthetic care you can trust in Madinah",
+      headline: "Trusted medical & aesthetic care in Madinah",
       support:
-        "Rode Medical Centre — laser, skin, pediatrics, and specialist care with a welcoming team.",
+        "Rode Medical Centre — dental, skin, medical aesthetics, and pediatrics under one roof.",
       ratingLabel: "Google Maps rating",
+      servicesEyebrow: "Specialties",
       servicesTitle: "Our services",
-      servicesSupport: "Thoughtful medical and aesthetic care for your health and confidence.",
+      servicesSupport: "Clear packages and offers for professional medical and aesthetic care.",
+      reviewsEyebrow: "Patient trust",
       reviewsTitle: "What patients say",
       reviewsSupport: "Over nine hundred reviews from families across Madinah.",
-      visitTitle: "Visit us",
-      visitSupport: "Al Rayah, Madinah — we look forward to welcoming you.",
+      visitTitle: "Visit us in Al Rayah",
+      visitSupport: "Conveniently located in Madinah — book your visit today.",
     },
     services: {
       title: "Rode services & offers",
@@ -214,20 +222,20 @@ const dictionaries: Record<Locale, Dictionary> = {
       support: "A comprehensive medical centre in the heart of Madinah.",
       body: [
         "Rode Medical Centre (مجمع رود الشامل الطبي العام) is a trusted clinic offering medical and aesthetic services for families in Madinah.",
-        "We focus on the full visit experience — from reception to treatment — with a team frequently praised for skill, care, and integrity.",
+        "We focus on the full visit — from reception to treatment — with a team known for skill, care, and integrity.",
         "Whether you need dental care, skincare, filler, Botox, or pediatrics, our goal is for you to leave feeling better.",
       ],
       highlightsTitle: "Why Rode?",
       highlights: [
         "4.1 rating from 929+ Google reviews",
-        "Specialized doctors · certified devices · natural results",
+        "Specialized doctors, certified devices, and natural results",
         "Convenient location in Al Rayah",
-        "Active on Instagram, TikTok, and Snapchat",
+        "Direct booking by phone or WhatsApp",
       ],
     },
     contact: {
       title: "Contact",
-      support: "Book or ask questions by phone, WhatsApp, or in person.",
+      support: "Book an appointment or ask a question by phone, WhatsApp, or in person.",
       address: "Address",
       phone: "Phone",
       phoneWhatsapp: "Call & WhatsApp",
@@ -236,6 +244,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       social: "Follow us",
     },
     footer: {
+      explore: "Explore",
       rights: "All rights reserved",
     },
   },

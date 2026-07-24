@@ -1,6 +1,7 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n";
+import { site } from "@/lib/site";
 
 const reviews = {
   ar: [
@@ -40,15 +41,24 @@ export function Reviews() {
   return (
     <section className="section section--soft">
       <div className="section__intro reveal">
+        <p className="section__eyebrow">{t.home.reviewsEyebrow}</p>
         <h2>{t.home.reviewsTitle}</h2>
         <p>{t.home.reviewsSupport}</p>
       </div>
+      <p className="review-trust reveal">
+        <span className="review-trust__stars" aria-hidden>
+          ★★★★☆
+        </span>
+        <span>
+          {site.rating} · {site.reviewCount}+ {t.home.ratingLabel}
+        </span>
+      </p>
       <div className="review-list">
         {items.map((review, index) => (
           <blockquote
             key={review.name}
             className="review-item reveal"
-            style={{ animationDelay: `${0.1 * index}s` }}
+            style={{ animationDelay: `${0.08 * index}s` }}
           >
             <p>“{review.text}”</p>
             <footer>— {review.name}</footer>

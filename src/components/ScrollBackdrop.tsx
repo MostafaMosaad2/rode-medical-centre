@@ -13,9 +13,8 @@ export function ScrollBackdrop() {
 
     const update = () => {
       const y = window.scrollY;
-      layer.style.setProperty("--scroll-y", `${y}px`);
-      layer.style.setProperty("--scroll-shift", `${y * 0.22}px`);
-      layer.style.setProperty("--scroll-shift-slow", `${y * 0.08}px`);
+      layer.style.setProperty("--scroll-shift", `${y * 0.16}px`);
+      layer.style.setProperty("--scroll-shift-slow", `${y * 0.06}px`);
       ticking = false;
     };
 
@@ -35,7 +34,6 @@ export function ScrollBackdrop() {
     <div className="scroll-backdrop" ref={layerRef} aria-hidden>
       <div className="scroll-backdrop__orb scroll-backdrop__orb--one" />
       <div className="scroll-backdrop__orb scroll-backdrop__orb--two" />
-      <div className="scroll-backdrop__orb scroll-backdrop__orb--three" />
       <div className="scroll-backdrop__grid" />
       <div className="scroll-backdrop__wave" />
     </div>

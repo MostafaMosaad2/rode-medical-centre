@@ -14,7 +14,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="site-footer__inner">
         <div className="site-footer__brand">
-          <Image src="/logo.png" alt="" width={64} height={64} />
+          <Image src="/logo.png" alt="" width={60} height={60} />
           <div>
             <p className="site-footer__name">RODE</p>
             <p>{locale === "ar" ? site.nameAr : site.nameEn}</p>
@@ -23,7 +23,7 @@ export function Footer() {
 
         <div className="site-footer__cols">
           <div>
-            <h3>{t.nav.home}</h3>
+            <h3>{t.footer.explore}</h3>
             <Link href="/services">{t.nav.services}</Link>
             <Link href="/about">{t.nav.about}</Link>
             <Link href="/contact">{t.nav.contact}</Link>
@@ -39,9 +39,6 @@ export function Footer() {
             />
             <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
               WhatsApp
-            </a>
-            <a href={site.linktree} target="_blank" rel="noopener noreferrer">
-              Linktree
             </a>
           </div>
           <div>

@@ -10,14 +10,23 @@ export function Hero() {
 
   return (
     <section className="hero">
-      <div className="hero__glow" aria-hidden />
-      <div className="hero__mesh" aria-hidden />
+      <div className="hero__media" aria-hidden>
+        <Image
+          src="/offers/dental.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="hero__photo"
+        />
+        <div className="hero__veil" />
+      </div>
       <div className="hero__content">
         <Image
           src="/logo.png"
           alt={site.nameEn}
-          width={168}
-          height={168}
+          width={148}
+          height={148}
           className="hero__logo"
           priority
         />
@@ -35,10 +44,6 @@ export function Hero() {
             {t.cta.viewServices}
           </Link>
         </div>
-        <p className="hero__rating">
-          <span aria-hidden>★</span> {site.rating} · {site.reviewCount}+{" "}
-          {t.home.ratingLabel}
-        </p>
       </div>
     </section>
   );

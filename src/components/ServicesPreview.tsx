@@ -12,6 +12,7 @@ export function ServicesPreview() {
   return (
     <section className="section">
       <div className="section__intro reveal">
+        <p className="section__eyebrow">{t.home.servicesEyebrow}</p>
         <h2>{t.home.servicesTitle}</h2>
         <p>{t.home.servicesSupport}</p>
       </div>
@@ -32,9 +33,6 @@ export function ServicesPreview() {
                   className="offer-preview__image"
                   sizes="(max-width: 860px) 100vw, 33vw"
                 />
-                <span className="offer-preview__badge">
-                  {locale === "ar" ? category.titleAr : category.titleEn}
-                </span>
               </div>
               <div className="offer-preview__copy">
                 <h3>{locale === "ar" ? category.titleAr : category.titleEn}</h3>
