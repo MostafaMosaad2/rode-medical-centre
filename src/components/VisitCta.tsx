@@ -1,7 +1,7 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n";
-import { site, whatsappUrl } from "@/lib/site";
+import { site } from "@/lib/site";
 
 export function VisitCta() {
   const { t, locale } = useI18n();
@@ -20,14 +20,6 @@ export function VisitCta() {
         <div className="hero__actions">
           <a
             className="btn btn--primary btn--lg"
-            href={whatsappUrl()}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t.cta.book}
-          </a>
-          <a
-            className="btn btn--ghost btn--lg"
             href={site.mapsUrl}
             target="_blank"
             rel="noopener noreferrer"

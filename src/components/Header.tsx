@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PhoneNumber } from "@/components/PhoneNumber";
 import { useI18n } from "@/lib/i18n";
-import { site, whatsappUrl } from "@/lib/site";
+import { site } from "@/lib/site";
 
 export function Header() {
   const { t, locale, toggleLocale, dir } = useI18n();
@@ -24,6 +24,7 @@ export function Header() {
     { href: "/", label: t.nav.home },
     { href: "/services", label: t.nav.services },
     { href: "/doctors", label: t.nav.doctors },
+    { href: "/book", label: t.nav.book },
     { href: "/about", label: t.nav.about },
     { href: "/contact", label: t.nav.contact },
   ];
@@ -33,19 +34,13 @@ export function Header() {
       <div className="site-header__inner">
         <Link href="/" className="brand-mark" aria-label={site.nameEn}>
           <Image
-            src="/logo.png"
+            src="/rode-logo.png"
             alt={site.nameEn}
-            width={52}
-            height={52}
+            width={220}
+            height={220}
             className="brand-mark__logo"
             priority
           />
-          <span className="brand-mark__text">
-            <span className="brand-mark__name">RODE</span>
-            <span className="brand-mark__sub">
-              {locale === "ar" ? site.nameAr : site.nameEn}
-            </span>
-          </span>
         </Link>
 
         <nav className="site-nav" aria-label="Primary">
@@ -76,14 +71,9 @@ export function Header() {
           >
             <span className="sr-only">{t.cta.call} </span>
           </PhoneNumber>
-          <a
-            className="btn btn--primary"
-            href={whatsappUrl()}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t.cta.whatsapp}
-          </a>
+          <Link className="btn btn--primary" href="/book">
+            {t.nav.book}
+          </Link>
         </div>
       </div>
       <div className="site-header__mobile-nav" dir={dir}>

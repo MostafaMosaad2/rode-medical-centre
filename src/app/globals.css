@@ -1,5 +1,44 @@
 @import "tailwindcss";
 
+/* Place licensed TT Norms webfont files in /public/fonts/ */
+@font-face {
+  font-family: "TT Norms";
+  src:
+    local("TT Norms Pro ExtraBold"),
+    local("TT Norms ExtraBold"),
+    url("/fonts/TTNorms-ExtraBold.woff2") format("woff2"),
+    url("/fonts/TTNormsPro-ExtraBold.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TT Norms";
+  src:
+    local("TT Norms Pro Bold"),
+    local("TT Norms Bold"),
+    url("/fonts/TTNorms-Bold.woff2") format("woff2"),
+    url("/fonts/TTNormsPro-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TT Norms";
+  src:
+    local("TT Norms Pro Regular"),
+    local("TT Norms Regular"),
+    local("TT Norms Pro"),
+    local("TT Norms"),
+    url("/fonts/TTNorms-Regular.woff2") format("woff2"),
+    url("/fonts/TTNormsPro-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --rode-cyan: #00a8d4;
   --rode-blue: #1a4db8;
@@ -16,6 +55,7 @@
   --foreground: var(--rode-ink);
   --font-display: var(--font-outfit);
   --font-arabic: var(--font-cairo);
+  --font-brand: "TT Norms", "TT Norms Pro", var(--font-outfit), sans-serif;
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
@@ -451,8 +491,9 @@ html[lang="ar"] .footer-phone-label {
 }
 
 .brand-mark__logo {
-  border-radius: 999px;
-  box-shadow: 0 4px 14px rgba(26, 77, 184, 0.12);
+  width: auto;
+  height: 3.25rem;
+  object-fit: contain;
 }
 
 .brand-mark__text {
@@ -575,16 +616,18 @@ html[lang="ar"] .footer-phone-label {
 }
 
 .hero__logo {
-  border-radius: 999px;
-  box-shadow: 0 16px 40px rgba(26, 77, 184, 0.16);
+  width: min(16rem, 72vw);
+  height: auto;
+  object-fit: contain;
   animation: rise 0.85s ease both;
 }
 
 .hero__brand {
   margin: 0.25rem 0 0;
+  font-family: var(--font-brand);
   font-size: clamp(2.6rem, 8.5vw, 5rem);
   font-weight: 800;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   line-height: 1;
   color: var(--rode-deep);
   animation: rise 0.9s ease 0.05s both;
@@ -1118,27 +1161,71 @@ html[lang="ar"] .doctor-card__block h4 {
   gap: 2.25rem;
 }
 
+.site-footer__brand-block {
+  display: grid;
+  gap: 1.25rem;
+}
+
 .site-footer__brand {
   display: flex;
   gap: 0.85rem;
   align-items: center;
 }
 
-.site-footer__brand img {
-  border-radius: 999px;
-}
-
-.site-footer__name {
-  margin: 0;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+.site-footer__social h3 {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--rode-deep);
 }
 
-.site-footer__brand p:last-child {
-  margin: 0.2rem 0 0;
-  color: var(--rode-muted);
-  font-size: 0.9rem;
+html[lang="ar"] .site-footer__social h3 {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.92rem;
+}
+
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.social-links__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid var(--rode-line);
+  border-radius: var(--radius-md);
+  color: var(--rode-deep);
+  background: rgba(255, 255, 255, 0.9);
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.social-links__item svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.social-links__item:hover {
+  color: white;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--rode-cyan), var(--rode-blue));
+  transform: translateY(-1px);
+}
+
+.site-footer__logo {
+  width: auto;
+  height: 6.5rem;
+  object-fit: contain;
 }
 
 .site-footer__cols {
@@ -1248,8 +1335,180 @@ html[lang="ar"] .site-footer__cols h3 {
   }
 
   .hero__brand {
-    letter-spacing: 0.22em;
+    letter-spacing: 0.2em;
   }
+}
+
+.booking-section {
+  padding-top: 0.5rem;
+  padding-bottom: 4rem;
+}
+
+.booking-form {
+  max-width: 720px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.75rem;
+}
+
+.booking-lookup__row {
+  display: grid;
+  gap: 0.65rem;
+}
+
+@media (min-width: 640px) {
+  .booking-lookup__row {
+    grid-template-columns: 1fr auto;
+    align-items: stretch;
+  }
+}
+
+.booking-lookup__row .btn {
+  white-space: nowrap;
+}
+
+.booking-patients__list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.booking-patient {
+  display: grid;
+  gap: 0.2rem;
+  text-align: start;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--rode-line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--rode-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.booking-patient:hover {
+  border-color: rgba(0, 168, 212, 0.45);
+}
+
+.booking-patient span {
+  color: var(--rode-muted);
+  font-size: 0.9rem;
+}
+
+.booking-msg__phone {
+  color: inherit;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.booking-file-meta {
+  font-weight: 500;
+  color: var(--rode-muted);
+}
+
+.booking-form__grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 720px) {
+  .booking-form__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.booking-field {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.booking-field--full {
+  grid-column: 1 / -1;
+}
+
+.booking-field > span,
+.booking-field > legend {
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--rode-deep);
+}
+
+.booking-field input[type="text"],
+.booking-field input[type="tel"],
+.booking-field input[type="date"],
+.booking-field select {
+  width: 100%;
+  min-height: 2.85rem;
+  border: 1px solid var(--rode-line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.92);
+  padding: 0.65rem 0.85rem;
+  color: var(--rode-ink);
+  font: inherit;
+}
+
+.booking-field input:focus,
+.booking-field select:focus {
+  outline: 2px solid rgba(0, 168, 212, 0.35);
+  outline-offset: 1px;
+  border-color: rgba(0, 168, 212, 0.55);
+}
+
+.booking-slots__label {
+  margin: 0 0 0.75rem;
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--rode-deep);
+}
+
+.booking-slots__status {
+  margin: 0;
+  color: var(--rode-muted);
+}
+
+.booking-slots__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.65rem;
+}
+
+.booking-slot {
+  min-height: 2.75rem;
+  border: 1px solid var(--rode-line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--rode-ink);
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.booking-slot:hover {
+  border-color: rgba(0, 168, 212, 0.45);
+}
+
+.booking-slot.is-active {
+  background: linear-gradient(135deg, var(--rode-cyan), var(--rode-blue));
+  border-color: transparent;
+  color: white;
+}
+
+.booking-msg {
+  margin: 0;
+  font-weight: 600;
+}
+
+.booking-msg--error {
+  color: #9c2f2f;
+}
+
+.booking-msg--ok {
+  color: #1f6b2e;
 }
 
 @media (prefers-reduced-motion: reduce) {

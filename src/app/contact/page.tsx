@@ -1,6 +1,7 @@
 "use client";
 
 import { PhoneNumber } from "@/components/PhoneNumber";
+import { SocialLinks } from "@/components/SocialLinks";
 import { useI18n } from "@/lib/i18n";
 import { site, whatsappUrl } from "@/lib/site";
 
@@ -58,13 +59,11 @@ export default function ContactPage() {
           </article>
           <article className="contact-card reveal">
             <h3>{t.contact.social}</h3>
-            <a href={site.linktree} target="_blank" rel="noopener noreferrer">
-              Linktree / Instagram · TikTok · Snapchat
-            </a>
+            <SocialLinks />
           </article>
         </div>
         <div className="section__cta reveal">
-          <a className="btn btn--primary btn--lg" href={whatsappUrl()}>
+          <a className="btn btn--primary btn--lg" href="/book">
             {t.cta.book}
           </a>
         </div>

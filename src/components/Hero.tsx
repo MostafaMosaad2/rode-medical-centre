@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
-import { site, whatsappUrl } from "@/lib/site";
+import { site } from "@/lib/site";
 
 export function Hero() {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
 
   return (
     <section className="hero">
@@ -23,24 +23,19 @@ export function Hero() {
       </div>
       <div className="hero__content">
         <Image
-          src="/logo.png"
+          src="/rode-logo.png"
           alt={site.nameEn}
-          width={148}
-          height={148}
+          width={320}
+          height={320}
           className="hero__logo"
           priority
         />
-        <p className="hero__brand">RODE</p>
-        <p className="hero__clinic">
-          {locale === "ar" ? site.nameAr : site.nameEn}
-        </p>
         <h1 className="hero__headline">{t.home.headline}</h1>
-        <p className="hero__support">{t.home.support}</p>
+        {t.home.support ? (
+          <p className="hero__support">{t.home.support}</p>
+        ) : null}
         <div className="hero__actions">
-          <a className="btn btn--primary btn--lg" href={whatsappUrl()}>
-            {t.cta.book}
-          </a>
-          <Link className="btn btn--ghost btn--lg" href="/services">
+          <Link className="btn btn--primary btn--lg" href="/services">
             {t.cta.viewServices}
           </Link>
         </div>

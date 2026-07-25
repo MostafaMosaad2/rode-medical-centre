@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PhoneNumber } from "@/components/PhoneNumber";
+import { SocialLinks } from "@/components/SocialLinks";
 import { useI18n } from "@/lib/i18n";
-import { site, whatsappUrl } from "@/lib/site";
+import { site } from "@/lib/site";
 
 export function Footer() {
   const { t, locale } = useI18n();
@@ -13,11 +14,19 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <div className="site-footer__inner">
-        <div className="site-footer__brand">
-          <Image src="/logo.png" alt="" width={60} height={60} />
-          <div>
-            <p className="site-footer__name">RODE</p>
-            <p>{locale === "ar" ? site.nameAr : site.nameEn}</p>
+        <div className="site-footer__brand-block">
+          <div className="site-footer__brand">
+            <Image
+              src="/rode-logo.png"
+              alt={locale === "ar" ? site.nameAr : site.nameEn}
+              width={200}
+              height={200}
+              className="site-footer__logo"
+            />
+          </div>
+          <div className="site-footer__social">
+            <h3>{t.contact.social}</h3>
+            <SocialLinks />
           </div>
         </div>
 
@@ -26,6 +35,7 @@ export function Footer() {
             <h3>{t.footer.explore}</h3>
             <Link href="/services">{t.nav.services}</Link>
             <Link href="/doctors">{t.nav.doctors}</Link>
+            <Link href="/book">{t.nav.book}</Link>
             <Link href="/about">{t.nav.about}</Link>
             <Link href="/contact">{t.nav.contact}</Link>
           </div>
@@ -38,9 +48,6 @@ export function Footer() {
               display={site.phoneCallOnlyDisplay}
               tel={site.phoneCallOnlyTel}
             />
-            <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
-              WhatsApp
-            </a>
           </div>
           <div>
             <h3>{t.contact.address}</h3>

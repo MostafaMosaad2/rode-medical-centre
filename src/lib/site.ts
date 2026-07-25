@@ -21,9 +21,10 @@ export const site = {
   hoursNoteAr: "يفتح يوم السبت عند الساعة ٢ م — تواصل معنا لمعرفة مواعيد باقي الأيام",
   linktree: "https://linktr.ee/rcmc.sa",
   social: {
-    instagram: "https://linktr.ee/rcmc.sa",
-    tiktok: "https://linktr.ee/rcmc.sa",
-    snapchat: "https://linktr.ee/rcmc.sa",
+    instagram: "https://www.instagram.com/rcmc.sa",
+    tiktok: "https://www.tiktok.com/@rcmc.sa",
+    snapchat:
+      "https://www.snapchat.com/@rcmc.sa?share_id=LVAG-cdQTfQ&locale=ar-EG",
   },
 } as const;
 

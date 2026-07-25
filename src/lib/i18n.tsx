@@ -20,6 +20,7 @@ type Dictionary = {
     doctors: string;
     about: string;
     contact: string;
+    book: string;
   };
   cta: {
     call: string;
@@ -28,6 +29,33 @@ type Dictionary = {
     book: string;
     viewServices: string;
     viewDoctors: string;
+  };
+  book: {
+    title: string;
+    support: string;
+    service: string;
+    date: string;
+    time: string;
+    lookup: string;
+    lookupPlaceholder: string;
+    checkFile: string;
+    lookingUp: string;
+    lookupFirst: string;
+    fileFound: string;
+    chooseFile: string;
+    noFile: string;
+    submit: string;
+    submitting: string;
+    loadingSlots: string;
+    noSlots: string;
+    success: string;
+    errorLoadClinics: string;
+    errorLoadSlots: string;
+    errorPickSlot: string;
+    errorLookup: string;
+    errorNoFile: string;
+    errorSlotGone: string;
+    errorReserve: string;
   };
   home: {
     headline: string;
@@ -90,6 +118,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       doctors: "الأطباء",
       about: "من نحن",
       contact: "تواصل معنا",
+      book: "الحجز",
     },
     cta: {
       call: "اتصل الآن",
@@ -99,10 +128,39 @@ const dictionaries: Record<Locale, Dictionary> = {
       viewServices: "استعرض الخدمات",
       viewDoctors: "تعرّف على الأطباء",
     },
-    home: {
-      headline: "رعاية طبية وتجميلية موثوقة في المدينة المنورة",
+    book: {
+      title: "احجز موعد الليزر",
       support:
-        "مجمع رود الشامل الطبي العام — أسنان، بشرة، تجميل طبي، وطب أطفال تحت سقف واحد.",
+        "للحجز يجب أن يكون لديك ملف في العيادة. أدخل رقم الجوال أو الهوية الوطنية أولاً، ثم اختر الجهاز والفترة والوقت.",
+      service: "العيادة / الجهاز",
+      date: "التاريخ",
+      time: "الوقت المتاح",
+      lookup: "رقم الجوال أو الهوية الوطنية",
+      lookupPlaceholder: "05xxxxxxxx أو رقم الهوية",
+      checkFile: "تحقق من الملف",
+      lookingUp: "جاري التحقق...",
+      lookupFirst: "تحقق من ملفك أولاً لتظهر المواعيد المتاحة.",
+      fileFound: "تم العثور على ملفك",
+      chooseFile: "اختر ملفك",
+      noFile:
+        "لا يوجد ملف بهذا الرقم في نظام العيادة. فضلاً اتصلوا بالمجمع لفتح ملف جديد:",
+      submit: "تأكيد الحجز",
+      submitting: "جاري تأكيد الحجز، يرجى الانتظار...",
+      loadingSlots: "جاري تحميل المواعيد المتاحة، يرجى الانتظار...",
+      noSlots: "لا توجد مواعيد بين ٤ م و ١٠ م في هذا اليوم. جرّب تاريخاً آخر.",
+      success: "تم حجز موعدك بنجاح في نظام العيادة. نراكم قريباً.",
+      errorLoadClinics: "تعذّر تحميل العيادات. حدّث الصفحة وحاول مرة أخرى.",
+      errorLoadSlots:
+        "تعذّر تحميل المواعيد من نظام العيادة. انتظر لحظة ثم حاول مرة أخرى.",
+      errorPickSlot: "اختر وقت الموعد أولاً.",
+      errorLookup: "أدخل رقم جوال أو هوية وطنية صالحاً.",
+      errorNoFile: "يجب التحقق من ملفك في العيادة قبل الحجز.",
+      errorSlotGone: "هذا الموعد لم يعد متاحاً. اختر وقتاً آخر.",
+      errorReserve: "تعذّر إتمام الحجز. حاول مرة أخرى أو تواصل معنا.",
+    },
+    home: {
+      headline: "جميع التخصصات الطبية تحت سقف واحد",
+      support: "",
       ratingLabel: "تقييم على خرائط جوجل",
       servicesEyebrow: "التخصصات",
       servicesTitle: "خدماتنا",
@@ -196,6 +254,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       doctors: "Doctors",
       about: "About",
       contact: "Contact",
+      book: "Book",
     },
     cta: {
       call: "Call now",
@@ -204,6 +263,36 @@ const dictionaries: Record<Locale, Dictionary> = {
       book: "Book a visit",
       viewServices: "View services",
       viewDoctors: "Meet our doctors",
+    },
+    book: {
+      title: "Book a laser appointment",
+      support:
+        "You need an existing clinic file to book. Enter your mobile or national ID first, then choose the device, period, and time.",
+      service: "Clinic / device",
+      date: "Date",
+      time: "Available times",
+      lookup: "Mobile number or national ID",
+      lookupPlaceholder: "05xxxxxxxx or national ID",
+      checkFile: "Check file",
+      lookingUp: "Checking...",
+      lookupFirst: "Check your clinic file first to see available times.",
+      fileFound: "File found",
+      chooseFile: "Choose your file",
+      noFile:
+        "No clinic file was found for this number. Please call the centre to open a new file:",
+      submit: "Confirm booking",
+      submitting: "Confirming booking, please wait...",
+      loadingSlots: "Loading available times, please wait...",
+      noSlots: "No times between 4:00 PM and 10:00 PM on this day. Try another date.",
+      success: "Your appointment was booked in the clinic system. See you soon.",
+      errorLoadClinics: "Could not load clinics. Refresh and try again.",
+      errorLoadSlots:
+        "Could not load times from the clinic system. Wait a moment and try again.",
+      errorPickSlot: "Please choose a time slot first.",
+      errorLookup: "Enter a valid mobile number or national ID.",
+      errorNoFile: "Please verify your clinic file before booking.",
+      errorSlotGone: "That time is no longer available. Please choose another.",
+      errorReserve: "Booking failed. Try again or contact the clinic.",
     },
     home: {
       headline: "Trusted medical & aesthetic care in Madinah",
