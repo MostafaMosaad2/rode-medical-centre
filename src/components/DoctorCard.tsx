@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useId, useState } from "react";
 import type { Doctor } from "@/lib/doctors";
 import { useI18n } from "@/lib/i18n";
@@ -25,7 +26,7 @@ export function DoctorCard({ doctor, index = 0 }: DoctorCardProps) {
 
   return (
     <article
-      className={`doctor-card reveal${open ? " is-open" : ""}`}
+      className={`doctor-card reveal${open ? " is-open" : ""}${doctor.image ? " doctor-card--photo" : ""}`}
       style={{ animationDelay: `${0.05 * index}s` }}
     >
       <button
@@ -35,9 +36,22 @@ export function DoctorCard({ doctor, index = 0 }: DoctorCardProps) {
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}
       >
-        <span className="doctor-card__avatar" aria-hidden>
-          {locale === "ar" ? doctor.initialsAr : doctor.initialsEn}
-        </span>
+        {doctor.image ? (
+          <span className="doctor-card__photo">
+            <Image
+              src={doctor.image}
+              alt={name}
+              width={112}
+              height={112}
+              className="doctor-card__photo-img"
+              sizes="112px"
+            />
+          </span>
+        ) : (
+          <span className="doctor-card__avatar" aria-hidden>
+            {locale === "ar" ? doctor.initialsAr : doctor.initialsEn}
+          </span>
+        )}
         <span className="doctor-card__summary">
           <span className="doctor-card__name">{name}</span>
           <span className="doctor-card__title">{title}</span>

@@ -25,6 +25,8 @@ export type Doctor = {
   featured?: boolean;
   initialsAr: string;
   initialsEn: string;
+  /** Portrait under /public/doctors — omit to fall back to initials */
+  image?: string;
 };
 
 export const doctorDepartments: {
@@ -66,6 +68,7 @@ export const doctors: Doctor[] = [
     featured: true,
     initialsAr: "فب",
     initialsEn: "FB",
+    image: "/doctors/fayez-el-baz.jpg",
   },
   {
     id: "abeer-al-namankany",
@@ -111,6 +114,7 @@ export const doctors: Doctor[] = [
     featured: true,
     initialsAr: "عن",
     initialsEn: "AN",
+    image: "/doctors/abeer-al-namankany.jpg",
   },
   {
     id: "walid-satih",
@@ -130,6 +134,7 @@ export const doctors: Doctor[] = [
     featured: true,
     initialsAr: "وس",
     initialsEn: "WS",
+    image: "/doctors/walid-satih.jpg",
   },
   {
     id: "amani-murshid",
@@ -172,6 +177,7 @@ export const doctors: Doctor[] = [
     ],
     initialsAr: "فا",
     initialsEn: "FA",
+    image: "/doctors/faten-ibrahim-agha.jpg",
   },
   {
     id: "ahmed-arwani",
@@ -198,6 +204,7 @@ export const doctors: Doctor[] = [
     ],
     initialsAr: "أع",
     initialsEn: "AA",
+    image: "/doctors/ahmed-arwani.jpg",
   },
   {
     id: "mohammed-abu-mahfouz",
@@ -228,6 +235,7 @@ export const doctors: Doctor[] = [
     featured: true,
     initialsAr: "مح",
     initialsEn: "MM",
+    image: "/doctors/mohammed-abu-mahfouz.jpg",
   },
   {
     id: "majda-mustafa",
@@ -253,6 +261,7 @@ export const doctors: Doctor[] = [
     ],
     initialsAr: "ما",
     initialsEn: "MJ",
+    image: "/doctors/majda-mustafa.jpg",
   },
   {
     id: "reem-barakat",
@@ -291,6 +300,7 @@ export const doctors: Doctor[] = [
     ],
     initialsAr: "رب",
     initialsEn: "RB",
+    image: "/doctors/reem-barakat.jpg",
   },
   {
     id: "rasha-al-amin",
@@ -343,6 +353,7 @@ export const doctors: Doctor[] = [
     featured: true,
     initialsAr: "رأ",
     initialsEn: "RA",
+    image: "/doctors/rasha-al-amin.jpg",
   },
   {
     id: "mohammad-yasser-barakat",
@@ -383,6 +394,7 @@ export const doctors: Doctor[] = [
     featured: true,
     initialsAr: "مب",
     initialsEn: "MB",
+    image: "/doctors/mohammad-yasser-barakat.jpg",
   },
   {
     id: "ibrahim-alloush",
@@ -437,6 +449,7 @@ export const doctors: Doctor[] = [
     featured: true,
     initialsAr: "بش",
     initialsEn: "BS",
+    image: "/doctors/bashar-sheikho.jpg",
   },
   {
     id: "moataz-al-rahaili",
@@ -471,6 +484,7 @@ export const doctors: Doctor[] = [
     ],
     initialsAr: "مر",
     initialsEn: "MR",
+    image: "/doctors/moataz-al-rahaili.jpg",
   },
 ];
 
