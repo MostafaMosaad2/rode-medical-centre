@@ -1,6 +1,5 @@
 export type DoctorDepartment =
   | "dental"
-  | "ent"
   | "obgyn"
   | "pediatrics"
   | "lab"
@@ -37,7 +36,6 @@ export const doctorDepartments: {
   { id: "dental", titleAr: "طب الأسنان", titleEn: "Dental" },
   { id: "obgyn", titleAr: "النساء والتوليد", titleEn: "Obstetrics & Gynecology" },
   { id: "pediatrics", titleAr: "طب الأطفال", titleEn: "Pediatrics" },
-  { id: "ent", titleAr: "أنف وأذن وحنجرة", titleEn: "ENT" },
   { id: "general", titleAr: "الطب العام", titleEn: "General Medicine" },
   { id: "lab", titleAr: "المختبرات الطبية", titleEn: "Medical Laboratory" },
 ];
@@ -135,23 +133,6 @@ export const doctors: Doctor[] = [
     initialsAr: "وس",
     initialsEn: "WS",
     image: "/doctors/walid-satih.jpg",
-  },
-  {
-    id: "amani-murshid",
-    nameAr: "د. أماني مرشد",
-    nameEn: "Dr. Amani Murshid",
-    titleAr: "طبيبة أسنان",
-    titleEn: "Dentist",
-    department: "dental",
-    experienceAr: "طب أسنان شامل ورعاية للأطفال",
-    experienceEn: "Comprehensive dentistry with pediatric care",
-    credentials: [],
-    services: [
-      { ar: "طب أسنان الأطفال", en: "Pediatric dentistry" },
-      { ar: "علاجات الأسنان العامة", en: "General dental treatments" },
-    ],
-    initialsAr: "أم",
-    initialsEn: "AM",
   },
   {
     id: "faten-ibrahim-agha",
@@ -395,32 +376,6 @@ export const doctors: Doctor[] = [
     initialsAr: "مب",
     initialsEn: "MB",
     image: "/doctors/mohammad-yasser-barakat.jpg",
-  },
-  {
-    id: "ibrahim-alloush",
-    nameAr: "د. إبراهيم علوش",
-    nameEn: "Dr. Ibrahim Alloush",
-    titleAr: "استشاري أنف وأذن وحنجرة",
-    titleEn: "Consultant ENT Specialist",
-    department: "ent",
-    experienceAr: "خبرة أكثر من 20 سنة",
-    experienceEn: "More than 20 years of experience",
-    credentials: [
-      {
-        ar: "جامعة دمشق — سوريا",
-        en: "Damascus University — Syria",
-      },
-    ],
-    services: [
-      {
-        ar: "خدمات الأنف والأذن والحنجرة",
-        en: "Ear, nose, and throat care",
-      },
-      { ar: "علاج التهاب الجيوب الأنفية", en: "Sinusitis treatment" },
-    ],
-    featured: true,
-    initialsAr: "اع",
-    initialsEn: "IA",
   },
   {
     id: "bashar-sheikho",
