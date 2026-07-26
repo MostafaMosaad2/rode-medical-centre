@@ -34,8 +34,9 @@ type PatientOption = {
   phoneOrId: string;
 };
 
-function todayIso(): string {
+function tomorrowIso(): string {
   const d = new Date();
+  d.setDate(d.getDate() + 1);
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
@@ -59,7 +60,7 @@ export function BookingForm() {
   const { t, locale } = useI18n();
   const [clinics, setClinics] = useState<ClinicOption[]>([]);
   const [clinicId, setClinicId] = useState("");
-  const [date, setDate] = useState(todayIso);
+  const [date, setDate] = useState(tomorrowIso);
   const [slots, setSlots] = useState<SlotOption[]>([]);
   const [selectedSs, setSelectedSs] = useState("");
   const [lookup, setLookup] = useState("");
@@ -407,7 +408,7 @@ export function BookingForm() {
             <input
               type="date"
               value={date}
-              min={todayIso()}
+              min={tomorrowIso()}
               onChange={(e) => setDate(e.target.value)}
               disabled={!canBook || submitting}
               required

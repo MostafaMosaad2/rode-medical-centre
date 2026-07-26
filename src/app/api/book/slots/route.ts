@@ -44,10 +44,11 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unknown clinic" }, { status: 400 });
   }
 
-  const today = new Date();
-  const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-  if (date < todayIso) {
-    return NextResponse.json({ error: "Date is in the past" }, { status: 400 });
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowIso = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+  if (date < tomorrowIso) {
+    return NextResponse.json({ error: "Date must be tomorrow or later" }, { status: 400 });
   }
 
   try {
