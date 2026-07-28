@@ -1511,6 +1511,43 @@ html[lang="ar"] .site-footer__cols h3 {
   color: #1f6b2e;
 }
 
+.booking-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(12, 32, 48, 0.45);
+}
+
+.booking-confirm__panel {
+  width: min(100%, 26rem);
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.35rem 1.25rem;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid var(--rode-line);
+  box-shadow: 0 18px 48px rgba(12, 32, 48, 0.18);
+}
+
+.booking-confirm__text {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 650;
+  line-height: 1.7;
+  color: var(--rode-deep);
+  text-align: center;
+}
+
+.booking-confirm__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: center;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -8,6 +8,7 @@ import {
   type FormEvent,
 } from "react";
 import { userSafeError } from "@/lib/bookingErrors";
+import { hasHourAvailability } from "@/lib/imdad/hours";
 import { useI18n } from "@/lib/i18n";
 import { site } from "@/lib/site";
 
@@ -33,6 +34,20 @@ type PatientOption = {
   fileId: string;
   phoneOrId: string;
 };
+
+type SessionType = "basic" | "retouch";
+
+type TreatmentType =
+  | "full_body"
+  | "full_body_no_back_belly"
+  | "mini_limbs"
+  | "small_area"
+  | "large_area";
+
+const HOUR_TREATMENTS: ReadonlySet<TreatmentType> = new Set([
+  "full_body",
+  "full_body_no_back_belly",
+]);
 
 function tomorrowIso(): string {
   const d = new Date();
@@ -60,6 +75,9 @@ export function BookingForm() {
   const { t, locale } = useI18n();
   const [clinics, setClinics] = useState<ClinicOption[]>([]);
   const [clinicId, setClinicId] = useState("");
+  const [sessionType, setSessionType] = useState<SessionType>("basic");
+  const [treatmentType, setTreatmentType] =
+    useState<TreatmentType>("full_body");
   const [date, setDate] = useState(tomorrowIso);
   const [slots, setSlots] = useState<SlotOption[]>([]);
   const [selectedSs, setSelectedSs] = useState("");
@@ -74,9 +92,35 @@ export function BookingForm() {
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [slotsNonce, setSlotsNonce] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const lookupSeq = useRef(0);
+
+  const sessionLabel =
+    sessionType === "basic" ? t.book.sessionBasic : t.book.sessionRetouch;
+
+  const treatmentLabel = (() => {
+    switch (treatmentType) {
+      case "full_body":
+        return t.book.treatmentFullBody;
+      case "full_body_no_back_belly":
+        return t.book.treatmentFullBodyNoBackBelly;
+      case "mini_limbs":
+        return t.book.treatmentMiniLimbs;
+      case "small_area":
+        return t.book.treatmentSmallArea;
+      case "large_area":
+        return t.book.treatmentLargeArea;
+    }
+  })();
+
+  const needsHourSlot = HOUR_TREATMENTS.has(treatmentType);
+  const visibleSlots = (() => {
+    if (!needsHourSlot) return slots;
+    const times = new Set(slots.map((s) => s.time));
+    return slots.filter((s) => hasHourAvailability(s.time, times));
+  })();
 
   const showUserError = (message: string | undefined, fallback: string) => {
     setError(userSafeError(message, fallback));
@@ -151,6 +195,17 @@ export function BookingForm() {
     };
   }, [clinicId, date, selectedPatient, slotsNonce]);
 
+  useEffect(() => {
+    if (!selectedSs) return;
+    const times = new Set(slots.map((s) => s.time));
+    const stillValid = slots.some((s) => {
+      if (s.ss !== selectedSs) return false;
+      if (!needsHourSlot) return true;
+      return hasHourAvailability(s.time, times);
+    });
+    if (!stillValid) setSelectedSs("");
+  }, [slots, selectedSs, needsHourSlot]);
+
   async function onLookup(e?: FormEvent) {
     e?.preventDefault();
     const seq = ++lookupSeq.current;
@@ -160,6 +215,7 @@ export function BookingForm() {
     setSelectedPatient(null);
     setError("");
     setSuccess("");
+    setConfirmOpen(false);
 
     const q = lookup.trim();
     if (!q) {
@@ -224,7 +280,7 @@ export function BookingForm() {
     }
   }
 
-  async function onSubmit(e: FormEvent) {
+  function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -233,7 +289,25 @@ export function BookingForm() {
       showUserError(undefined, t.book.errorNoFile);
       return;
     }
-    const slot = slots.find((s) => s.ss === selectedSs);
+    const slot = visibleSlots.find((s) => s.ss === selectedSs);
+    if (!slot) {
+      showUserError(undefined, t.book.errorPickSlot);
+      return;
+    }
+
+    setConfirmOpen(true);
+  }
+
+  async function confirmBooking() {
+    setConfirmOpen(false);
+    setError("");
+    setSuccess("");
+
+    if (!selectedPatient) {
+      showUserError(undefined, t.book.errorNoFile);
+      return;
+    }
+    const slot = visibleSlots.find((s) => s.ss === selectedSs);
     if (!slot) {
       showUserError(undefined, t.book.errorPickSlot);
       return;
@@ -245,6 +319,7 @@ export function BookingForm() {
         clinicId: slot.clinicId,
         ss: slot.ss,
         patientToken: selectedPatient.token,
+        notes: `جلسة: ${sessionLabel} | الخدمة: ${treatmentLabel} | حجز من موقع مجمع رود الطبي`,
       };
 
       for (let attempt = 1; ; attempt += 1) {
@@ -269,6 +344,8 @@ export function BookingForm() {
             setSelectedPatient(null);
             setNoFile(false);
             setSlots([]);
+            setSessionType("basic");
+            setTreatmentType("full_body");
             return;
           }
 
@@ -323,6 +400,7 @@ export function BookingForm() {
                 setError("");
                 setSuccess("");
                 setLookingUp(false);
+                setConfirmOpen(false);
               }}
               inputMode="numeric"
               dir="ltr"
@@ -388,7 +466,7 @@ export function BookingForm() {
       <form onSubmit={onSubmit}>
         <div className="booking-form__grid">
           <label className="booking-field booking-field--full">
-            <span>{t.book.service}</span>
+            <span>{t.book.clinic}</span>
             <select
               value={clinicId}
               onChange={(e) => setClinicId(e.target.value)}
@@ -404,6 +482,40 @@ export function BookingForm() {
           </label>
 
           <label className="booking-field">
+            <span>{t.book.session}</span>
+            <select
+              value={sessionType}
+              onChange={(e) => setSessionType(e.target.value as SessionType)}
+              disabled={!canBook || submitting}
+              required
+            >
+              <option value="basic">{t.book.sessionBasic}</option>
+              <option value="retouch">{t.book.sessionRetouch}</option>
+            </select>
+          </label>
+
+          <label className="booking-field">
+            <span>{t.book.treatment}</span>
+            <select
+              value={treatmentType}
+              onChange={(e) => {
+                setTreatmentType(e.target.value as TreatmentType);
+                setSelectedSs("");
+              }}
+              disabled={!canBook || submitting}
+              required
+            >
+              <option value="full_body">{t.book.treatmentFullBody}</option>
+              <option value="full_body_no_back_belly">
+                {t.book.treatmentFullBodyNoBackBelly}
+              </option>
+              <option value="mini_limbs">{t.book.treatmentMiniLimbs}</option>
+              <option value="small_area">{t.book.treatmentSmallArea}</option>
+              <option value="large_area">{t.book.treatmentLargeArea}</option>
+            </select>
+          </label>
+
+          <label className="booking-field booking-field--full">
             <span>{t.book.date}</span>
             <input
               type="date"
@@ -421,7 +533,7 @@ export function BookingForm() {
             <p className="booking-slots__label">{t.book.time}</p>
             {loadingSlots ? (
               <p className="booking-slots__status">{t.book.loadingSlots}</p>
-            ) : slots.length === 0 ? (
+            ) : visibleSlots.length === 0 ? (
               <p className="booking-slots__status">{t.book.noSlots}</p>
             ) : (
               <div
@@ -429,7 +541,7 @@ export function BookingForm() {
                 role="radiogroup"
                 aria-label={t.book.time}
               >
-                {slots.map((slot) => {
+                {visibleSlots.map((slot) => {
                   const active = selectedSs === slot.ss;
                   return (
                     <button
@@ -464,6 +576,39 @@ export function BookingForm() {
           {submitting ? t.book.submitting : t.book.submit}
         </button>
       </form>
+
+      {confirmOpen ? (
+        <div
+          className="booking-confirm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="booking-confirm-title"
+        >
+          <div className="booking-confirm__panel">
+            <p id="booking-confirm-title" className="booking-confirm__text">
+              {t.book.confirmNotice}
+            </p>
+            <div className="booking-confirm__actions">
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={() => setConfirmOpen(false)}
+                disabled={submitting}
+              >
+                {t.book.confirmCancel}
+              </button>
+              <button
+                type="button"
+                className="btn btn--primary"
+                onClick={() => void confirmBooking()}
+                disabled={submitting}
+              >
+                {t.book.confirmContinue}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

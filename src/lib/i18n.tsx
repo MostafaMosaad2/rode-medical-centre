@@ -33,7 +33,16 @@ type Dictionary = {
   book: {
     title: string;
     support: string;
-    service: string;
+    clinic: string;
+    session: string;
+    sessionBasic: string;
+    sessionRetouch: string;
+    treatment: string;
+    treatmentFullBody: string;
+    treatmentFullBodyNoBackBelly: string;
+    treatmentMiniLimbs: string;
+    treatmentSmallArea: string;
+    treatmentLargeArea: string;
     date: string;
     time: string;
     lookup: string;
@@ -49,6 +58,9 @@ type Dictionary = {
     loadingSlots: string;
     noSlots: string;
     success: string;
+    confirmNotice: string;
+    confirmContinue: string;
+    confirmCancel: string;
     errorLoadClinics: string;
     errorLoadSlots: string;
     errorPickSlot: string;
@@ -132,7 +144,16 @@ const dictionaries: Record<Locale, Dictionary> = {
       title: "احجز موعد الليزر",
       support:
         "للحجز يجب أن يكون لديك ملف في العيادة. أدخل رقم الجوال أو الهوية الوطنية أولاً، ثم اختر الجهاز والفترة والوقت.",
-      service: "العيادة / الجهاز",
+      clinic: "العيادة / الجهاز",
+      session: "الجلسة",
+      sessionBasic: "أساسي",
+      sessionRetouch: "رتوش",
+      treatment: "الخدمة",
+      treatmentFullBody: "فل بدي كامل الجسم",
+      treatmentFullBodyNoBackBelly: "فل بدي بدون ظهر وبطن",
+      treatmentMiniLimbs: "ميني اطراف",
+      treatmentSmallArea: "منطقة صغيرة من اختيارك",
+      treatmentLargeArea: "منطقة كبيرة من اختيارك",
       date: "التاريخ",
       time: "الوقت المتاح",
       lookup: "رقم الجوال أو الهوية الوطنية",
@@ -149,6 +170,10 @@ const dictionaries: Record<Locale, Dictionary> = {
       loadingSlots: "جاري تحميل المواعيد المتاحة، يرجى الانتظار...",
       noSlots: "لا توجد مواعيد بين ٤ م و ١٠ م في هذا اليوم. جرّب تاريخاً آخر.",
       success: "تم حجز موعدك بنجاح في نظام العيادة. نراكم قريباً.",
+      confirmNotice:
+        "لتغيير موعد الحجز يرجى التواصل مع خدمة العملاء ويجب التواصل قبل الموعد ب 48 ساعة",
+      confirmContinue: "متابعة الحجز",
+      confirmCancel: "إلغاء",
       errorLoadClinics: "تعذّر تحميل العيادات. حدّث الصفحة وحاول مرة أخرى.",
       errorLoadSlots:
         "تعذّر تحميل المواعيد من نظام العيادة. انتظر لحظة ثم حاول مرة أخرى.",
@@ -268,7 +293,16 @@ const dictionaries: Record<Locale, Dictionary> = {
       title: "Book a laser appointment",
       support:
         "You need an existing clinic file to book. Enter your mobile or national ID first, then choose the device, period, and time.",
-      service: "Clinic / device",
+      clinic: "Clinic / device",
+      session: "Session",
+      sessionBasic: "Basic",
+      sessionRetouch: "Retouch",
+      treatment: "Service",
+      treatmentFullBody: "Full body — entire body",
+      treatmentFullBodyNoBackBelly: "Full body — without back & belly",
+      treatmentMiniLimbs: "Mini limbs",
+      treatmentSmallArea: "Small area of your choice",
+      treatmentLargeArea: "Large area of your choice",
       date: "Date",
       time: "Available times",
       lookup: "Mobile number or national ID",
@@ -285,6 +319,10 @@ const dictionaries: Record<Locale, Dictionary> = {
       loadingSlots: "Loading available times, please wait...",
       noSlots: "No times between 4:00 PM and 10:00 PM on this day. Try another date.",
       success: "Your appointment was booked in the clinic system. See you soon.",
+      confirmNotice:
+        "To change your appointment, please contact customer service — and you must contact them at least 48 hours before the appointment.",
+      confirmContinue: "Continue booking",
+      confirmCancel: "Cancel",
       errorLoadClinics: "Could not load clinics. Refresh and try again.",
       errorLoadSlots:
         "Could not load times from the clinic system. Wait a moment and try again.",
