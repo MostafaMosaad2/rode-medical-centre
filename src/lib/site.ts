@@ -17,8 +17,8 @@ export const site = {
   mapsUrl: "https://maps.app.goo.gl/EA9DbabUdrEq3KJRA",
   rating: 4.1,
   reviewCount: 929,
-  hoursNoteEn: "Opens Saturday at 2:00 PM — call for full weekly hours",
-  hoursNoteAr: "يفتح يوم السبت عند الساعة ٢ م — تواصل معنا لمعرفة مواعيد باقي الأيام",
+  hoursNoteEn: "Saturday–Thursday, 2:00 PM – 11:30 PM",
+  hoursNoteAr: "من السبت إلى الخميس، من ٢ م إلى ١١:٣٠ م",
   linktree: "https://linktr.ee/rcmc.sa",
   social: {
     instagram: "https://www.instagram.com/rcmc.sa",
