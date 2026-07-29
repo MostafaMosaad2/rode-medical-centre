@@ -113,6 +113,11 @@ export function BookingForm() {
   const [submitting, setSubmitting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [alreadyBookedOpen, setAlreadyBookedOpen] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [paymentChoice, setPaymentChoice] = useState<"paid" | "unpaid" | null>(
+    null,
+  );
+  const [foundPatients, setFoundPatients] = useState<PatientOption[]>([]);
   const [apptInfo, setApptInfo] = useState<PatientAppointmentsInfo | null>(
     null,
   );
@@ -129,6 +134,52 @@ export function BookingForm() {
     const times = new Set(slots.map((s) => s.time));
     return slots.filter((s) => hasHourAvailability(s.time, times));
   })();
+
+  function resetPaymentGate() {
+    setPaymentOpen(false);
+    setPaymentChoice(null);
+    setFoundPatients([]);
+  }
+
+  async function loadAppointmentsForPatients(
+    list: PatientOption[],
+    seq: number,
+  ) {
+    if (list.length === 0) return;
+    setLoadingAppts(true);
+    setNoBookingAfterLookup(false);
+
+    let apptAttempt = 0;
+    while (seq === lookupSeq.current) {
+      apptAttempt += 1;
+      try {
+        const apptRes = await fetch("/api/book/appointments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fileIds: list.map((p) => p.fileId),
+            phoneOrId: list[0]?.phoneOrId,
+          }),
+        });
+        const apptData =
+          (await apptRes.json()) as Partial<PatientAppointmentsInfo> & {
+            matchedFileId?: string | null;
+            filesWithBooking?: string[];
+            retry?: boolean;
+          };
+        if (seq !== lookupSeq.current) return;
+        if (apptRes.ok) {
+          startTransition(() => {
+            applyAppointmentResult(list, apptData);
+          });
+          return;
+        }
+      } catch {
+        // retry quietly
+      }
+      await sleep(Math.min(1000 * apptAttempt, 5000));
+    }
+  }
 
   const showUserError = (message: string | undefined, fallback: string) => {
     setError(userSafeError(message, fallback));
@@ -359,7 +410,7 @@ export function BookingForm() {
   ]);
 
   useEffect(() => {
-    if (!clinicId || !date || !selectedPatient) {
+    if (!clinicId || !date || !selectedPatient || paymentChoice !== "paid") {
       setSlots([]);
       setSelectedSs("");
       return;
@@ -396,7 +447,7 @@ export function BookingForm() {
     return () => {
       cancelled = true;
     };
-  }, [clinicId, date, selectedPatient, slotsNonce]);
+  }, [clinicId, date, selectedPatient, slotsNonce, paymentChoice]);
 
   useEffect(() => {
     if (!selectedSs) return;
@@ -423,6 +474,7 @@ export function BookingForm() {
     setSuccess("");
     setConfirmOpen(false);
     setAlreadyBookedOpen(false);
+    resetPaymentGate();
 
     const q = lookup.trim();
     if (!q) {
@@ -460,6 +512,7 @@ export function BookingForm() {
             if (!data.found || !data.patients?.length) {
               setSelectedPatient(null);
               setPatients([]);
+              setFoundPatients([]);
               setNoFile(true);
               return;
             }
@@ -467,39 +520,8 @@ export function BookingForm() {
             setNoFile(false);
             setError("");
             setLookingUp(false);
-            setLoadingAppts(true);
-
-            // Check bookings across all files for this national ID / phone
-            let apptAttempt = 0;
-            while (seq === lookupSeq.current) {
-              apptAttempt += 1;
-              try {
-                const apptRes = await fetch("/api/book/appointments", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    fileIds: data.patients.map((p) => p.fileId),
-                    phoneOrId: data.patients[0]?.phoneOrId,
-                  }),
-                });
-                const apptData =
-                  (await apptRes.json()) as Partial<PatientAppointmentsInfo> & {
-                    matchedFileId?: string | null;
-                    filesWithBooking?: string[];
-                    retry?: boolean;
-                  };
-                if (seq !== lookupSeq.current) return;
-                if (apptRes.ok) {
-                  startTransition(() => {
-                    applyAppointmentResult(data.patients!, apptData);
-                  });
-                  return;
-                }
-              } catch {
-                // retry quietly
-              }
-              await sleep(Math.min(1000 * apptAttempt, 5000));
-            }
+            setFoundPatients(data.patients);
+            setPaymentOpen(true);
             return;
           }
         } catch {
@@ -635,6 +657,7 @@ export function BookingForm() {
             setSlots([]);
             setSessionType("basic");
             setTreatmentType("full_body");
+            resetPaymentGate();
             return;
           }
 
@@ -720,17 +743,35 @@ export function BookingForm() {
   const canBook =
     Boolean(selectedPatient) &&
     !loadingAppts &&
-    Boolean(apptInfo?.hasAnyBooking);
+    Boolean(apptInfo?.hasAnyBooking) &&
+    paymentChoice === "paid";
   const showNoFile = noFile && !selectedPatient && !lookingUp;
   const showNoBooking =
-    noBookingAfterLookup ||
-    (Boolean(selectedPatient) &&
-      !loadingAppts &&
-      apptInfo !== null &&
-      !apptInfo.hasAnyBooking);
+    paymentChoice === "paid" &&
+    (noBookingAfterLookup ||
+      (Boolean(selectedPatient) &&
+        !loadingAppts &&
+        apptInfo !== null &&
+        !apptInfo.hasAnyBooking));
+  const showUnpaid =
+    paymentChoice === "unpaid" && foundPatients.length > 0;
   const showCheckingBookings =
-    (lookingUp === false && loadingAppts) ||
-    (Boolean(selectedPatient) && loadingAppts);
+    paymentChoice === "paid" &&
+    ((lookingUp === false && loadingAppts) ||
+      (Boolean(selectedPatient) && loadingAppts));
+
+  function onPaymentPaid() {
+    const list = foundPatients;
+    setPaymentChoice("paid");
+    setPaymentOpen(false);
+    const seq = lookupSeq.current;
+    void loadAppointmentsForPatients(list, seq);
+  }
+
+  function onPaymentUnpaid() {
+    setPaymentChoice("unpaid");
+    setPaymentOpen(false);
+  }
 
   return (
     <div className="booking-form">
@@ -755,6 +796,7 @@ export function BookingForm() {
                 setLookingUp(false);
                 setConfirmOpen(false);
                 setAlreadyBookedOpen(false);
+                resetPaymentGate();
               }}
               inputMode="numeric"
               dir="ltr"
@@ -825,6 +867,15 @@ export function BookingForm() {
       {showNoBooking ? (
         <p className="booking-msg booking-msg--error">
           {t.book.noBookingYet}{" "}
+          <a className="booking-msg__phone" href={`tel:${site.phoneTel}`} dir="ltr">
+            {site.phoneDisplay}
+          </a>
+        </p>
+      ) : null}
+
+      {showUnpaid ? (
+        <p className="booking-msg booking-msg--error">
+          {t.book.paymentUnpaidMsg}{" "}
           <a className="booking-msg__phone" href={`tel:${site.phoneTel}`} dir="ltr">
             {site.phoneDisplay}
           </a>
@@ -1018,6 +1069,37 @@ export function BookingForm() {
                 onClick={() => setAlreadyBookedOpen(false)}
               >
                 {t.book.alreadyBookedOk}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {paymentOpen ? (
+        <div
+          className="booking-confirm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="booking-payment-title"
+        >
+          <div className="booking-confirm__panel">
+            <p id="booking-payment-title" className="booking-confirm__text">
+              {t.book.paymentQuestion}
+            </p>
+            <div className="booking-confirm__actions">
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={onPaymentUnpaid}
+              >
+                {t.book.paymentUnpaid}
+              </button>
+              <button
+                type="button"
+                className="btn btn--primary"
+                onClick={onPaymentPaid}
+              >
+                {t.book.paymentPaid}
               </button>
             </div>
           </div>

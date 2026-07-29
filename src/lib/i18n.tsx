@@ -63,6 +63,10 @@ type Dictionary = {
     confirmCancel: string;
     alreadyBooked: string;
     alreadyBookedOk: string;
+    paymentQuestion: string;
+    paymentPaid: string;
+    paymentUnpaid: string;
+    paymentUnpaidMsg: string;
     noBookingYet: string;
     errorLoadClinics: string;
     errorLoadSlots: string;
@@ -183,6 +187,12 @@ const dictionaries: Record<Locale, Dictionary> = {
       confirmCancel: "إلغاء",
       alreadyBooked: "لديك حجز مسبق بالفعل",
       alreadyBookedOk: "حسناً",
+      paymentQuestion:
+        "هل الحجز لخدمة مدفوعة مسبقاً، أم خدمة جديدة لم يتم دفعها بعد؟",
+      paymentPaid: "مدفوعة مسبقاً",
+      paymentUnpaid: "خدمة جديدة غير مدفوعة",
+      paymentUnpaidMsg:
+        "لحجز خدمة جديدة غير مدفوعة، فضلاً اتصلوا بخدمة العملاء للدفع والحجز:",
       noBookingYet:
         "لا يوجد لديك حجز حتى الآن. فضلاً اتصلوا بخدمة العملاء للحجز:",
       errorLoadClinics: "تعذّر تحميل العيادات. حدّث الصفحة وحاول مرة أخرى.",
@@ -344,6 +354,12 @@ const dictionaries: Record<Locale, Dictionary> = {
       confirmCancel: "Cancel",
       alreadyBooked: "You already have a booking",
       alreadyBookedOk: "OK",
+      paymentQuestion:
+        "Is this booking for a service you already paid for, or a new service that has not been paid yet?",
+      paymentPaid: "Already paid",
+      paymentUnpaid: "New — not paid yet",
+      paymentUnpaidMsg:
+        "For a new unpaid service, please call customer service to pay and book:",
       noBookingYet:
         "You don’t have a booking yet. Please call customer service to book:",
       errorLoadClinics: "Could not load clinics. Refresh and try again.",

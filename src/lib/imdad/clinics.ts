@@ -12,7 +12,7 @@ export type BookableClinic = {
 export const LASER_CLINICS: BookableClinic[] = [
   {
     id: "125*1",
-    nameAr: "ليزر إزالة الشعر — PolyLase",
+    nameAr: "ليزر إزالة الشعر — بولي ليز",
     nameEn: "Laser hair removal — PolyLase",
     periodAr: "الفترة الأولى",
     periodEn: "First period",
@@ -20,7 +20,7 @@ export const LASER_CLINICS: BookableClinic[] = [
   },
   {
     id: "125*2",
-    nameAr: "ليزر إزالة الشعر — Gentle",
+    nameAr: "ليزر إزالة الشعر — جنتل",
     nameEn: "Laser hair removal — Gentle",
     periodAr: "الفترة الثانية",
     periodEn: "Second period",
@@ -28,7 +28,7 @@ export const LASER_CLINICS: BookableClinic[] = [
   },
   {
     id: "125*4",
-    nameAr: "ليزر إزالة الشعر — Elite+",
+    nameAr: "ليزر إزالة الشعر — اليت",
     nameEn: "Laser hair removal — Elite+",
     periodAr: "الفترة الرابعة",
     periodEn: "Fourth period",
