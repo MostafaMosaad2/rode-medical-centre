@@ -208,7 +208,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       errorNoBasicLaser:
         "لا يوجد حجز أساسي ليزر في ملفك. جلسة الرتوش تحتاج حجز أساسي سابق.",
       errorRetouchDate:
-        "جلسة الرتوش متاحة فقط خلال ٧ إلى ١١ يوماً من تاريخ حجز الأساسي لليزر.",
+        "جلسة الرتوش متاحة فقط خلال ٧ إلى 10 يوماً من تاريخ حجز الأساسي لليزر.",
       errorBasicDate:
         "جلسة الأساسي متاحة فقط بعد ٢١ يوماً من آخر حجز أساسي لليزر.",
     },
@@ -375,7 +375,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       errorNoBasicLaser:
         "No basic laser booking was found. A retouch session needs a previous basic booking.",
       errorRetouchDate:
-        "Retouch sessions are only available 7 to 11 days after your basic laser booking.",
+        "Retouch sessions are only available 7 to 10 days after your basic laser booking.",
       errorBasicDate:
         "A basic session is only available 21 days after your last basic laser booking.",
     },

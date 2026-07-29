@@ -142,7 +142,7 @@ export async function POST(request: Request) {
           return NextResponse.json(
             {
               error:
-                "Retouch date must be 7–11 days after the basic laser booking",
+                "Retouch date must be 7–10 days after the basic laser booking",
               code: "RETOUCH_DATE",
               retouchMinDate: window.min,
               retouchMaxDate: window.max,

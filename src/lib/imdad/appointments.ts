@@ -1,9 +1,9 @@
 import { normalizeLookupQuery } from "./digits";
 import { getImdadConfig } from "./config";
 
-/** Retouch opens 7–11 days after the أساسي laser reservation (e.g. 20 → 27..31). */
+/** Retouch opens 7–10 days after the أساسي laser reservation (e.g. 20 → 27..30). */
 export const RETOUCH_MIN_DAYS_AFTER = 7;
-export const RETOUCH_MAX_DAYS_AFTER = 11;
+export const RETOUCH_MAX_DAYS_AFTER = 10;
 /** Next أساسي opens only 21+ days after the prior أساسي (skipping رتوش in between). */
 export const BASIC_MIN_DAYS_AFTER = 21;
 
@@ -449,7 +449,7 @@ export function lastBookingDate(
 /**
  * Walk newest → oldest laser reservations.
  * If the latest note is رتوش (or other), keep going until an أساس note is found.
- * That أساس date anchors both رتوش (+7..+11) and next أساسي (+21).
+ * That أساس date anchors both رتوش (+7..+10) and next أساسي (+21).
  */
 export function lastBasicLaserBookingDate(
   appointments: ImdadAppointment[],
