@@ -61,6 +61,9 @@ type Dictionary = {
     confirmNotice: string;
     confirmContinue: string;
     confirmCancel: string;
+    alreadyBooked: string;
+    alreadyBookedOk: string;
+    noBookingYet: string;
     errorLoadClinics: string;
     errorLoadSlots: string;
     errorPickSlot: string;
@@ -68,6 +71,10 @@ type Dictionary = {
     errorNoFile: string;
     errorSlotGone: string;
     errorReserve: string;
+    errorNoLastBooking: string;
+    errorNoBasicLaser: string;
+    errorRetouchDate: string;
+    errorBasicDate: string;
   };
   home: {
     headline: string;
@@ -174,6 +181,10 @@ const dictionaries: Record<Locale, Dictionary> = {
         "لتغيير موعد الحجز يرجى التواصل مع خدمة العملاء ويجب التواصل قبل الموعد ب 48 ساعة",
       confirmContinue: "متابعة الحجز",
       confirmCancel: "إلغاء",
+      alreadyBooked: "لديك حجز مسبق بالفعل",
+      alreadyBookedOk: "حسناً",
+      noBookingYet:
+        "لا يوجد لديك حجز حتى الآن. فضلاً اتصلوا بخدمة العملاء للحجز:",
       errorLoadClinics: "تعذّر تحميل العيادات. حدّث الصفحة وحاول مرة أخرى.",
       errorLoadSlots:
         "تعذّر تحميل المواعيد من نظام العيادة. انتظر لحظة ثم حاول مرة أخرى.",
@@ -182,6 +193,14 @@ const dictionaries: Record<Locale, Dictionary> = {
       errorNoFile: "يجب التحقق من ملفك في العيادة قبل الحجز.",
       errorSlotGone: "هذا الموعد لم يعد متاحاً. اختر وقتاً آخر.",
       errorReserve: "تعذّر إتمام الحجز. حاول مرة أخرى أو تواصل معنا.",
+      errorNoLastBooking:
+        "لا يوجد لديك حجز حتى الآن. فضلاً اتصلوا بخدمة العملاء للحجز:",
+      errorNoBasicLaser:
+        "لا يوجد حجز أساسي ليزر في ملفك. جلسة الرتوش تحتاج حجز أساسي سابق.",
+      errorRetouchDate:
+        "جلسة الرتوش متاحة فقط خلال ٧ إلى ١١ يوماً من تاريخ حجز الأساسي لليزر.",
+      errorBasicDate:
+        "جلسة الأساسي متاحة فقط بعد ٢١ يوماً من آخر حجز أساسي لليزر.",
     },
     home: {
       headline: "جميع التخصصات الطبية تحت سقف واحد",
@@ -323,6 +342,10 @@ const dictionaries: Record<Locale, Dictionary> = {
         "To change your appointment, please contact customer service — and you must contact them at least 48 hours before the appointment.",
       confirmContinue: "Continue booking",
       confirmCancel: "Cancel",
+      alreadyBooked: "You already have a booking",
+      alreadyBookedOk: "OK",
+      noBookingYet:
+        "You don’t have a booking yet. Please call customer service to book:",
       errorLoadClinics: "Could not load clinics. Refresh and try again.",
       errorLoadSlots:
         "Could not load times from the clinic system. Wait a moment and try again.",
@@ -331,6 +354,14 @@ const dictionaries: Record<Locale, Dictionary> = {
       errorNoFile: "Please verify your clinic file before booking.",
       errorSlotGone: "That time is no longer available. Please choose another.",
       errorReserve: "Booking failed. Try again or contact the clinic.",
+      errorNoLastBooking:
+        "You don’t have a booking yet. Please call customer service to book:",
+      errorNoBasicLaser:
+        "No basic laser booking was found. A retouch session needs a previous basic booking.",
+      errorRetouchDate:
+        "Retouch sessions are only available 7 to 11 days after your basic laser booking.",
+      errorBasicDate:
+        "A basic session is only available 21 days after your last basic laser booking.",
     },
     home: {
       headline: "Trusted medical & aesthetic care in Madinah",

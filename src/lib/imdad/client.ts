@@ -1,7 +1,26 @@
+import {
+  findPatientAppointments,
+  type ImdadAppointment,
+} from "./appointments";
 import { getImdadConfig } from "./config";
 import { isAllowedClinicId } from "./clinics";
 import { normalizeLookupQuery } from "./digits";
 import { isWithinBookingHours } from "./hours";
+
+export type { ImdadAppointment } from "./appointments";
+export {
+  hasUnconfirmedFutureBooking,
+  isRetouchHiddenAfterConfirmedRetouch,
+  lastBookingDate,
+  lastBasicLaserBookingDate,
+  retouchDateWindow,
+  basicMinDateAfter,
+  todayIsoLocal,
+  addDaysIso,
+  RETOUCH_MIN_DAYS_AFTER,
+  RETOUCH_MAX_DAYS_AFTER,
+  BASIC_MIN_DAYS_AFTER,
+} from "./appointments";
 
 export type ImdadSlot = {
   /** Raw IMDAD radio value (`ss`) */
@@ -629,7 +648,7 @@ async function reserveAppointmentOnce(
     nation_id: "1",
     search: patient.token,
     phone: patient.phoneOrId,
-    notes: input.notes?.trim() || "حجز من موقع مجمع رود الطبي",
+    notes: input.notes?.trim() || "( من الموقع )",
     ss: input.ss,
     submit: RESERVE_SUBMIT,
   });
@@ -667,4 +686,43 @@ export async function reserveAppointment(
   throw lastError instanceof Error
     ? lastError
     : new Error("Failed to reserve appointment");
+}
+
+/** Patient appointments via appoint_display.php?st_id={fileId}. */
+export async function findAppointmentsForPatient(input: {
+  fileId: string;
+  phoneOrId?: string;
+}): Promise<ImdadAppointment[]> {
+  const maxAttempts = 4;
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      clearSession();
+      return await findPatientAppointments(
+        {
+          login,
+          imdadFetch,
+          decodeHtml: decodeCp1256,
+          mergeCookieHeader,
+          parseSetCookie,
+          remember,
+          looksLikeLoginPage,
+          clearSession,
+        },
+        input,
+      );
+    } catch (err) {
+      lastError = err;
+      if (!isRetryableImdadError(err) || attempt === maxAttempts) {
+        throw err;
+      }
+      clearSession();
+      await new Promise((r) => setTimeout(r, Math.min(500 * attempt, 2500)));
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Failed to load patient appointments");
 }

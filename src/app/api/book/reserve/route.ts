@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import { isAllowedClinicId } from "@/lib/imdad/clinics";
-import { reserveAppointment } from "@/lib/imdad/client";
+import {
+  findAppointmentsForPatient,
+  hasUnconfirmedFutureBooking,
+  isRetouchHiddenAfterConfirmedRetouch,
+  lastBasicLaserBookingDate,
+  basicMinDateAfter,
+  parseSlotToken,
+  reserveAppointment,
+  retouchDateWindow,
+} from "@/lib/imdad/client";
 import { site } from "@/lib/site";
 
 export const runtime = "nodejs";
@@ -11,7 +20,17 @@ type Body = {
   ss?: string;
   patientToken?: string;
   notes?: string;
+  sessionType?: "basic" | "retouch";
 };
+
+function patientFromToken(token: string): { fileId: string; phoneOrId: string } | null {
+  const parts = token.split("*");
+  if (parts.length < 3) return null;
+  const phoneOrId = parts[parts.length - 1]?.trim() ?? "";
+  const fileId = parts[parts.length - 2]?.trim() ?? "";
+  if (!fileId || !phoneOrId) return null;
+  return { fileId, phoneOrId };
+}
 
 export async function POST(request: Request) {
   let body: Body;
@@ -24,6 +43,7 @@ export async function POST(request: Request) {
   const clinicId = body.clinicId?.trim() ?? "";
   const ss = body.ss?.trim() ?? "";
   const patientToken = body.patientToken?.trim() ?? "";
+  const sessionType = body.sessionType === "retouch" ? "retouch" : "basic";
 
   if (!clinicId || !isAllowedClinicId(clinicId)) {
     return NextResponse.json({ error: "Invalid clinic" }, { status: 400 });
@@ -44,6 +64,96 @@ export async function POST(request: Request) {
   }
 
   try {
+    const patient = patientFromToken(patientToken);
+    if (patient) {
+      const appointments = await findAppointmentsForPatient({
+        fileId: patient.fileId,
+        phoneOrId: patient.phoneOrId,
+      });
+
+      if (appointments.length === 0) {
+        return NextResponse.json(
+          {
+            error: "No booking yet — please call customer service",
+            code: "NO_BOOKING",
+            clinicPhone: site.phoneDisplay,
+            clinicTel: site.phoneTel,
+          },
+          { status: 409 },
+        );
+      }
+
+      if (sessionType === "basic" && hasUnconfirmedFutureBooking(appointments)) {
+        return NextResponse.json(
+          {
+            error: "You already have a booking",
+            code: "ALREADY_BOOKED",
+          },
+          { status: 409 },
+        );
+      }
+
+      if (sessionType === "basic") {
+        const basicLaserDate = lastBasicLaserBookingDate(appointments);
+        if (basicLaserDate) {
+          const minDate = basicMinDateAfter(basicLaserDate);
+          const slot = parseSlotToken(ss, clinicId);
+          if (!slot || slot.date < minDate) {
+            return NextResponse.json(
+              {
+                error:
+                  "Basic session must be at least 21 days after the previous basic laser booking",
+                code: "BASIC_DATE",
+                basicLaserDate,
+                basicMinDate: minDate,
+              },
+              { status: 409 },
+            );
+          }
+        }
+      }
+
+      if (sessionType === "retouch") {
+        if (isRetouchHiddenAfterConfirmedRetouch(appointments)) {
+          return NextResponse.json(
+            {
+              error:
+                "Retouch is not available after a confirmed retouch — book basic instead",
+              code: "RETOUCH_HIDDEN",
+            },
+            { status: 409 },
+          );
+        }
+        const basicLaserDate = lastBasicLaserBookingDate(appointments);
+        if (!basicLaserDate) {
+          return NextResponse.json(
+            {
+              error: "No basic laser booking found for retouch",
+              code: "NO_BASIC_LASER",
+              clinicPhone: site.phoneDisplay,
+              clinicTel: site.phoneTel,
+            },
+            { status: 409 },
+          );
+        }
+        const window = retouchDateWindow(basicLaserDate);
+        const slot = parseSlotToken(ss, clinicId);
+        if (!slot || slot.date < window.min || slot.date > window.max) {
+          return NextResponse.json(
+            {
+              error:
+                "Retouch date must be 7–11 days after the basic laser booking",
+              code: "RETOUCH_DATE",
+              retouchMinDate: window.min,
+              retouchMaxDate: window.max,
+              basicLaserDate,
+            },
+            { status: 409 },
+          );
+        }
+      }
+    }
+
     const result = await reserveAppointment({
       clinicId,
       ss,

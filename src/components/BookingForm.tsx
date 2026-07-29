@@ -49,14 +49,32 @@ const HOUR_TREATMENTS: ReadonlySet<TreatmentType> = new Set([
   "full_body_no_back_belly",
 ]);
 
+function pad2(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
 function tomorrowIso(): string {
   const d = new Date();
   d.setDate(d.getDate() + 1);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
+
+function clampDate(value: string, min: string, max: string): string {
+  if (value < min) return min;
+  if (value > max) return max;
+  return value;
+}
+
+type PatientAppointmentsInfo = {
+  hasAnyBooking: boolean;
+  hasUnconfirmedFuture: boolean;
+  hideRetouch: boolean;
+  lastBookingDate: string | null;
+  basicLaserDate: string | null;
+  basicMinDate: string | null;
+  retouchMinDate: string | null;
+  retouchMaxDate: string | null;
+};
 
 function clinicLabel(c: ClinicOption, locale: "ar" | "en"): string {
   const base = locale === "ar" ? c.nameAr : c.nameEn;
@@ -87,33 +105,23 @@ export function BookingForm() {
     null,
   );
   const [noFile, setNoFile] = useState(false);
+  const [noBookingAfterLookup, setNoBookingAfterLookup] = useState(false);
   const [loadingClinics, setLoadingClinics] = useState(true);
   const [lookingUp, setLookingUp] = useState(false);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [slotsNonce, setSlotsNonce] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [alreadyBookedOpen, setAlreadyBookedOpen] = useState(false);
+  const [apptInfo, setApptInfo] = useState<PatientAppointmentsInfo | null>(
+    null,
+  );
+  const [loadingAppts, setLoadingAppts] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const lookupSeq = useRef(0);
-
-  const sessionLabel =
-    sessionType === "basic" ? t.book.sessionBasic : t.book.sessionRetouch;
-
-  const treatmentLabel = (() => {
-    switch (treatmentType) {
-      case "full_body":
-        return t.book.treatmentFullBody;
-      case "full_body_no_back_belly":
-        return t.book.treatmentFullBodyNoBackBelly;
-      case "mini_limbs":
-        return t.book.treatmentMiniLimbs;
-      case "small_area":
-        return t.book.treatmentSmallArea;
-      case "large_area":
-        return t.book.treatmentLargeArea;
-    }
-  })();
+  const apptSeq = useRef(0);
+  const apptLoadedForFileId = useRef<string | null>(null);
 
   const needsHourSlot = HOUR_TREATMENTS.has(treatmentType);
   const visibleSlots = (() => {
@@ -125,6 +133,60 @@ export function BookingForm() {
   const showUserError = (message: string | undefined, fallback: string) => {
     setError(userSafeError(message, fallback));
   };
+
+  function applyAppointmentResult(
+    list: PatientOption[],
+    data: Partial<PatientAppointmentsInfo> & {
+      matchedFileId?: string | null;
+      filesWithBooking?: string[];
+    },
+  ) {
+    const withBooking = list.filter((p) =>
+      (data.filesWithBooking ?? []).includes(p.fileId),
+    );
+    const matched =
+      withBooking.find((p) => p.fileId === data.matchedFileId) ??
+      withBooking[0] ??
+      null;
+
+    if (!data.hasAnyBooking || !matched) {
+      apptLoadedForFileId.current = null;
+      setPatients(list);
+      setSelectedPatient(null);
+      setApptInfo({
+        hasAnyBooking: false,
+        hasUnconfirmedFuture: false,
+        hideRetouch: false,
+        lastBookingDate: null,
+        basicLaserDate: null,
+        basicMinDate: null,
+        retouchMinDate: null,
+        retouchMaxDate: null,
+      });
+      setNoBookingAfterLookup(true);
+      setLoadingAppts(false);
+      return;
+    }
+
+    apptLoadedForFileId.current = matched.fileId;
+    setNoBookingAfterLookup(false);
+    setPatients(withBooking.length > 0 ? withBooking : list);
+    setSelectedPatient(matched);
+    if (data.hideRetouch) {
+      setSessionType("basic");
+    }
+    setApptInfo({
+      hasAnyBooking: true,
+      hasUnconfirmedFuture: Boolean(data.hasUnconfirmedFuture),
+      hideRetouch: Boolean(data.hideRetouch),
+      lastBookingDate: data.lastBookingDate ?? null,
+      basicLaserDate: data.basicLaserDate ?? null,
+      basicMinDate: data.basicMinDate ?? null,
+      retouchMinDate: data.retouchMinDate ?? null,
+      retouchMaxDate: data.retouchMaxDate ?? null,
+    });
+    setLoadingAppts(false);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -154,6 +216,147 @@ export function BookingForm() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!selectedPatient) {
+      return;
+    }
+    if (apptLoadedForFileId.current === selectedPatient.fileId) {
+      return;
+    }
+
+    const seq = ++apptSeq.current;
+    const patient = selectedPatient;
+    setLoadingAppts(true);
+    setApptInfo(null);
+    setNoBookingAfterLookup(false);
+
+    (async () => {
+      let attempt = 0;
+      while (seq === apptSeq.current) {
+        attempt += 1;
+        try {
+          const res = await fetch("/api/book/appointments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fileId: patient.fileId,
+              phoneOrId: patient.phoneOrId,
+            }),
+          });
+          const data = (await res.json()) as Partial<PatientAppointmentsInfo> & {
+            matchedFileId?: string | null;
+            filesWithBooking?: string[];
+            retry?: boolean;
+          };
+          if (seq !== apptSeq.current) return;
+          if (res.ok) {
+            startTransition(() => {
+              apptLoadedForFileId.current = patient.fileId;
+              if (data.hideRetouch) {
+                setSessionType("basic");
+              }
+              setApptInfo({
+                hasAnyBooking: Boolean(data.hasAnyBooking),
+                hasUnconfirmedFuture: Boolean(data.hasUnconfirmedFuture),
+                hideRetouch: Boolean(data.hideRetouch),
+                lastBookingDate: data.lastBookingDate ?? null,
+                basicLaserDate: data.basicLaserDate ?? null,
+                basicMinDate: data.basicMinDate ?? null,
+                retouchMinDate: data.retouchMinDate ?? null,
+                retouchMaxDate: data.retouchMaxDate ?? null,
+              });
+              setNoBookingAfterLookup(!data.hasAnyBooking);
+              setLoadingAppts(false);
+            });
+            return;
+          }
+        } catch {
+          // Keep trying quietly
+        }
+        await sleep(Math.min(1000 * attempt, 5000));
+      }
+    })();
+
+    return () => {
+      apptSeq.current += 1;
+    };
+  }, [selectedPatient]);
+
+  useEffect(() => {
+    if (apptInfo?.hideRetouch && sessionType === "retouch") {
+      setSessionType("basic");
+    }
+  }, [apptInfo?.hideRetouch, sessionType]);
+
+  const dateMin = (() => {
+    const tomorrow = tomorrowIso();
+    if (sessionType === "retouch") {
+      const retouchMin = apptInfo?.retouchMinDate;
+      if (!retouchMin) return tomorrow;
+      return retouchMin > tomorrow ? retouchMin : tomorrow;
+    }
+    // أساسي: only after 21 days from last أساس (walking back past رتوش)
+    const basicMin = apptInfo?.basicMinDate;
+    if (!basicMin) return tomorrow;
+    return basicMin > tomorrow ? basicMin : tomorrow;
+  })();
+
+  const dateMax =
+    sessionType === "retouch" ? apptInfo?.retouchMaxDate ?? undefined : undefined;
+
+  const retouchWindowOpen =
+    sessionType !== "retouch" ||
+    Boolean(
+      apptInfo?.retouchMinDate &&
+        apptInfo.retouchMaxDate &&
+        apptInfo.retouchMaxDate >= tomorrowIso(),
+    );
+
+  useEffect(() => {
+    if (!apptInfo) return;
+    if (sessionType === "retouch") {
+      if (!apptInfo.retouchMinDate || !apptInfo.retouchMaxDate) return;
+      if (apptInfo.retouchMaxDate < tomorrowIso()) return;
+      setDate((prev) => clampDate(prev, dateMin, apptInfo.retouchMaxDate!));
+      return;
+    }
+    // أساسي — clamp to 21-day minimum when applicable
+    setDate((prev) => (prev < dateMin ? dateMin : prev));
+  }, [sessionType, apptInfo, dateMin]);
+
+  useEffect(() => {
+    if (sessionType !== "retouch" || loadingAppts || !apptInfo) return;
+    if (!apptInfo.hasAnyBooking) return;
+    if (!apptInfo.basicLaserDate || !apptInfo.retouchMinDate || !apptInfo.retouchMaxDate) {
+      setError(t.book.errorNoBasicLaser);
+      return;
+    }
+    if (!retouchWindowOpen) {
+      setError(t.book.errorRetouchDate);
+    }
+  }, [
+    sessionType,
+    loadingAppts,
+    apptInfo,
+    retouchWindowOpen,
+    t.book.errorNoBasicLaser,
+    t.book.errorRetouchDate,
+  ]);
+
+  useEffect(() => {
+    if (sessionType !== "basic" || loadingAppts || !apptInfo) return;
+    if (!apptInfo.basicMinDate) return;
+    if (apptInfo.basicMinDate > tomorrowIso() && date < apptInfo.basicMinDate) {
+      setError(t.book.errorBasicDate);
+    }
+  }, [
+    sessionType,
+    loadingAppts,
+    apptInfo,
+    date,
+    t.book.errorBasicDate,
+  ]);
 
   useEffect(() => {
     if (!clinicId || !date || !selectedPatient) {
@@ -211,11 +414,15 @@ export function BookingForm() {
     const seq = ++lookupSeq.current;
 
     setNoFile(false);
+    setNoBookingAfterLookup(false);
     setPatients([]);
     setSelectedPatient(null);
+    setApptInfo(null);
+    apptLoadedForFileId.current = null;
     setError("");
     setSuccess("");
     setConfirmOpen(false);
+    setAlreadyBookedOpen(false);
 
     const q = lookup.trim();
     if (!q) {
@@ -244,7 +451,6 @@ export function BookingForm() {
 
           if (seq !== lookupSeq.current) return;
 
-          // Validation only — never show technical/network text
           if (res.status === 400 && data.code === "INVALID") {
             showUserError(undefined, t.book.errorLookup);
             return;
@@ -257,16 +463,45 @@ export function BookingForm() {
               setNoFile(true);
               return;
             }
+
             setNoFile(false);
             setError("");
-            setPatients(data.patients);
-            if (data.patients.length === 1) {
-              setSelectedPatient(data.patients[0]!);
+            setLookingUp(false);
+            setLoadingAppts(true);
+
+            // Check bookings across all files for this national ID / phone
+            let apptAttempt = 0;
+            while (seq === lookupSeq.current) {
+              apptAttempt += 1;
+              try {
+                const apptRes = await fetch("/api/book/appointments", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    fileIds: data.patients.map((p) => p.fileId),
+                    phoneOrId: data.patients[0]?.phoneOrId,
+                  }),
+                });
+                const apptData =
+                  (await apptRes.json()) as Partial<PatientAppointmentsInfo> & {
+                    matchedFileId?: string | null;
+                    filesWithBooking?: string[];
+                    retry?: boolean;
+                  };
+                if (seq !== lookupSeq.current) return;
+                if (apptRes.ok) {
+                  startTransition(() => {
+                    applyAppointmentResult(data.patients!, apptData);
+                  });
+                  return;
+                }
+              } catch {
+                // retry quietly
+              }
+              await sleep(Math.min(1000 * apptAttempt, 5000));
             }
             return;
           }
-
-          // 503 / retry — keep checking quietly
         } catch {
           // fetch failed — keep checking quietly
         }
@@ -289,6 +524,43 @@ export function BookingForm() {
       showUserError(undefined, t.book.errorNoFile);
       return;
     }
+    if (loadingAppts) return;
+
+    if (apptInfo && !apptInfo.hasAnyBooking) {
+      return;
+    }
+
+    if (sessionType === "basic" && apptInfo?.hasUnconfirmedFuture) {
+      setAlreadyBookedOpen(true);
+      return;
+    }
+
+    if (sessionType === "basic" && apptInfo?.basicMinDate) {
+      if (date < apptInfo.basicMinDate) {
+        showUserError(undefined, t.book.errorBasicDate);
+        return;
+      }
+    }
+
+    if (sessionType === "retouch") {
+      if (apptInfo?.hideRetouch) {
+        setSessionType("basic");
+        return;
+      }
+      if (
+        !apptInfo?.basicLaserDate ||
+        !apptInfo.retouchMinDate ||
+        !apptInfo.retouchMaxDate
+      ) {
+        showUserError(undefined, t.book.errorNoBasicLaser);
+        return;
+      }
+      if (date < apptInfo.retouchMinDate || date > apptInfo.retouchMaxDate) {
+        showUserError(undefined, t.book.errorRetouchDate);
+        return;
+      }
+    }
+
     const slot = visibleSlots.find((s) => s.ss === selectedSs);
     if (!slot) {
       showUserError(undefined, t.book.errorPickSlot);
@@ -315,11 +587,28 @@ export function BookingForm() {
 
     setSubmitting(true);
     try {
+      const notesSession = sessionType === "basic" ? "اساسي" : "رتوش";
+      const notesTreatment = (() => {
+        switch (treatmentType) {
+          case "full_body":
+            return "فل بدي كامل الجسم";
+          case "full_body_no_back_belly":
+            return "فل بدي بدون ظهر وبطن";
+          case "mini_limbs":
+            return "ميني اطراف";
+          case "small_area":
+            return "منطقة صغيرة من اختيارك";
+          case "large_area":
+            return "منطقة كبيرة من اختيارك";
+        }
+      })();
+
       const payload = {
         clinicId: slot.clinicId,
         ss: slot.ss,
         patientToken: selectedPatient.token,
-        notes: `جلسة: ${sessionLabel} | الخدمة: ${treatmentLabel} | حجز من موقع مجمع رود الطبي`,
+        sessionType,
+        notes: `${notesSession} ${notesTreatment} ( من الموقع )`,
       };
 
       for (let attempt = 1; ; attempt += 1) {
@@ -356,6 +645,55 @@ export function BookingForm() {
             showUserError(undefined, t.book.errorNoFile);
             return;
           }
+          if (data.code === "ALREADY_BOOKED") {
+            setAlreadyBookedOpen(true);
+            return;
+          }
+          if (data.code === "NO_BOOKING" || data.code === "NO_LAST_BOOKING") {
+            setApptInfo((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    hasAnyBooking: false,
+                    hideRetouch: false,
+                    lastBookingDate: null,
+                    basicLaserDate: null,
+                    basicMinDate: null,
+                    retouchMinDate: null,
+                    retouchMaxDate: null,
+                  }
+                : {
+                    hasAnyBooking: false,
+                    hasUnconfirmedFuture: false,
+                    hideRetouch: false,
+                    lastBookingDate: null,
+                    basicLaserDate: null,
+                    basicMinDate: null,
+                    retouchMinDate: null,
+                    retouchMaxDate: null,
+                  },
+            );
+            return;
+          }
+          if (data.code === "NO_BASIC_LASER") {
+            showUserError(undefined, t.book.errorNoBasicLaser);
+            return;
+          }
+          if (data.code === "BASIC_DATE") {
+            showUserError(undefined, t.book.errorBasicDate);
+            return;
+          }
+          if (data.code === "RETOUCH_HIDDEN") {
+            setSessionType("basic");
+            setApptInfo((prev) =>
+              prev ? { ...prev, hideRetouch: true, retouchMinDate: null, retouchMaxDate: null } : prev,
+            );
+            return;
+          }
+          if (data.code === "RETOUCH_DATE") {
+            showUserError(undefined, t.book.errorRetouchDate);
+            return;
+          }
           if (data.code === "SLOT_GONE") {
             showUserError(undefined, t.book.errorSlotGone);
             setSelectedSs("");
@@ -379,8 +717,20 @@ export function BookingForm() {
     }
   }
 
-  const canBook = Boolean(selectedPatient);
+  const canBook =
+    Boolean(selectedPatient) &&
+    !loadingAppts &&
+    Boolean(apptInfo?.hasAnyBooking);
   const showNoFile = noFile && !selectedPatient && !lookingUp;
+  const showNoBooking =
+    noBookingAfterLookup ||
+    (Boolean(selectedPatient) &&
+      !loadingAppts &&
+      apptInfo !== null &&
+      !apptInfo.hasAnyBooking);
+  const showCheckingBookings =
+    (lookingUp === false && loadingAppts) ||
+    (Boolean(selectedPatient) && loadingAppts);
 
   return (
     <div className="booking-form">
@@ -395,12 +745,16 @@ export function BookingForm() {
                 lookupSeq.current += 1;
                 setLookup(e.target.value);
                 setNoFile(false);
+                setNoBookingAfterLookup(false);
                 setSelectedPatient(null);
                 setPatients([]);
+                setApptInfo(null);
+                apptLoadedForFileId.current = null;
                 setError("");
                 setSuccess("");
                 setLookingUp(false);
                 setConfirmOpen(false);
+                setAlreadyBookedOpen(false);
               }}
               inputMode="numeric"
               dir="ltr"
@@ -439,6 +793,11 @@ export function BookingForm() {
                 className="booking-patient"
                 onClick={() => {
                   setNoFile(false);
+                  setNoBookingAfterLookup(false);
+                  if (apptLoadedForFileId.current !== p.fileId) {
+                    apptLoadedForFileId.current = null;
+                    setApptInfo(null);
+                  }
                   setSelectedPatient(p);
                 }}
                 disabled={submitting}
@@ -463,6 +822,20 @@ export function BookingForm() {
         </p>
       ) : null}
 
+      {showNoBooking ? (
+        <p className="booking-msg booking-msg--error">
+          {t.book.noBookingYet}{" "}
+          <a className="booking-msg__phone" href={`tel:${site.phoneTel}`} dir="ltr">
+            {site.phoneDisplay}
+          </a>
+        </p>
+      ) : null}
+
+      {showCheckingBookings ? (
+        <p className="booking-slots__status">{t.book.loadingSlots}</p>
+      ) : null}
+
+      {canBook ? (
       <form onSubmit={onSubmit}>
         <div className="booking-form__grid">
           <label className="booking-field booking-field--full">
@@ -470,7 +843,7 @@ export function BookingForm() {
             <select
               value={clinicId}
               onChange={(e) => setClinicId(e.target.value)}
-              disabled={!canBook || loadingClinics || submitting}
+              disabled={loadingClinics || submitting}
               required
             >
               {clinics.map((c) => (
@@ -485,12 +858,23 @@ export function BookingForm() {
             <span>{t.book.session}</span>
             <select
               value={sessionType}
-              onChange={(e) => setSessionType(e.target.value as SessionType)}
-              disabled={!canBook || submitting}
+              onChange={(e) => {
+                const next = e.target.value as SessionType;
+                if (next === "retouch" && apptInfo?.hideRetouch) return;
+                setSessionType(next);
+                setError("");
+                setSelectedSs("");
+                if (next === "basic" && apptInfo?.hasUnconfirmedFuture) {
+                  setAlreadyBookedOpen(true);
+                }
+              }}
+              disabled={submitting}
               required
             >
               <option value="basic">{t.book.sessionBasic}</option>
-              <option value="retouch">{t.book.sessionRetouch}</option>
+              {!apptInfo?.hideRetouch ? (
+                <option value="retouch">{t.book.sessionRetouch}</option>
+              ) : null}
             </select>
           </label>
 
@@ -502,7 +886,7 @@ export function BookingForm() {
                 setTreatmentType(e.target.value as TreatmentType);
                 setSelectedSs("");
               }}
-              disabled={!canBook || submitting}
+              disabled={submitting}
               required
             >
               <option value="full_body">{t.book.treatmentFullBody}</option>
@@ -520,62 +904,68 @@ export function BookingForm() {
             <input
               type="date"
               value={date}
-              min={tomorrowIso()}
+              min={dateMin}
+              max={dateMax}
               onChange={(e) => setDate(e.target.value)}
-              disabled={!canBook || submitting}
+              disabled={
+                submitting || (sessionType === "retouch" && !retouchWindowOpen)
+              }
               required
             />
           </label>
         </div>
 
-        {canBook ? (
-          <div className="booking-slots">
-            <p className="booking-slots__label">{t.book.time}</p>
-            {loadingSlots ? (
-              <p className="booking-slots__status">{t.book.loadingSlots}</p>
-            ) : visibleSlots.length === 0 ? (
-              <p className="booking-slots__status">{t.book.noSlots}</p>
-            ) : (
-              <div
-                className="booking-slots__list"
-                role="radiogroup"
-                aria-label={t.book.time}
-              >
-                {visibleSlots.map((slot) => {
-                  const active = selectedSs === slot.ss;
-                  return (
-                    <button
-                      key={slot.ss}
-                      type="button"
-                      className={`booking-slot${active ? " is-active" : ""}`}
-                      onClick={() => setSelectedSs(slot.ss)}
-                      disabled={submitting}
-                      aria-pressed={active}
-                    >
-                      <span dir="ltr">{slot.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        ) : (
-          <p className="booking-slots__status">{t.book.lookupFirst}</p>
-        )}
+        <div className="booking-slots">
+          <p className="booking-slots__label">{t.book.time}</p>
+          {loadingSlots ? (
+            <p className="booking-slots__status">{t.book.loadingSlots}</p>
+          ) : visibleSlots.length === 0 ? (
+            <p className="booking-slots__status">{t.book.noSlots}</p>
+          ) : (
+            <div
+              className="booking-slots__list"
+              role="radiogroup"
+              aria-label={t.book.time}
+            >
+              {visibleSlots.map((slot) => {
+                const active = selectedSs === slot.ss;
+                return (
+                  <button
+                    key={slot.ss}
+                    type="button"
+                    className={`booking-slot${active ? " is-active" : ""}`}
+                    onClick={() => setSelectedSs(slot.ss)}
+                    disabled={submitting}
+                    aria-pressed={active}
+                  >
+                    <span dir="ltr">{slot.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {error && !showNoFile ? (
           <p className="booking-msg booking-msg--error">{error}</p>
         ) : null}
-        {success ? <p className="booking-msg booking-msg--ok">{success}</p> : null}
 
         <button
           type="submit"
           className="btn btn--primary btn--lg"
-          disabled={!canBook || submitting || loadingSlots || !selectedSs}
+          disabled={
+            submitting ||
+            loadingSlots ||
+            !selectedSs ||
+            (sessionType === "retouch" && !retouchWindowOpen)
+          }
         >
           {submitting ? t.book.submitting : t.book.submit}
         </button>
       </form>
+      ) : null}
+
+      {success ? <p className="booking-msg booking-msg--ok">{success}</p> : null}
 
       {confirmOpen ? (
         <div
@@ -604,6 +994,30 @@ export function BookingForm() {
                 disabled={submitting}
               >
                 {t.book.confirmContinue}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {alreadyBookedOpen ? (
+        <div
+          className="booking-confirm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="booking-already-title"
+        >
+          <div className="booking-confirm__panel">
+            <p id="booking-already-title" className="booking-confirm__text">
+              {t.book.alreadyBooked}
+            </p>
+            <div className="booking-confirm__actions">
+              <button
+                type="button"
+                className="btn btn--primary"
+                onClick={() => setAlreadyBookedOpen(false)}
+              >
+                {t.book.alreadyBookedOk}
               </button>
             </div>
           </div>
