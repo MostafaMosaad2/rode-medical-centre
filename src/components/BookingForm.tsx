@@ -76,6 +76,16 @@ type PatientAppointmentsInfo = {
   retouchMaxDate: string | null;
 };
 
+type LastAppointmentView = {
+  date: string;
+  time: string;
+  status: string;
+  clinic: string;
+  notes: string;
+};
+
+type BookingIntent = "book" | "my_appointment";
+
 function clinicLabel(c: ClinicOption, locale: "ar" | "en"): string {
   const base = locale === "ar" ? c.nameAr : c.nameEn;
   const period = locale === "ar" ? c.periodAr : c.periodEn;
@@ -117,10 +127,13 @@ export function BookingForm() {
   const [paymentChoice, setPaymentChoice] = useState<"paid" | "unpaid" | null>(
     null,
   );
+  const [intent, setIntent] = useState<BookingIntent | null>(null);
   const [foundPatients, setFoundPatients] = useState<PatientOption[]>([]);
   const [apptInfo, setApptInfo] = useState<PatientAppointmentsInfo | null>(
     null,
   );
+  const [lastAppointment, setLastAppointment] =
+    useState<LastAppointmentView | null>(null);
   const [loadingAppts, setLoadingAppts] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -139,6 +152,41 @@ export function BookingForm() {
     setPaymentOpen(false);
     setPaymentChoice(null);
     setFoundPatients([]);
+    setIntent(null);
+    setLastAppointment(null);
+  }
+
+  function statusLabel(status: string): string {
+    switch (status) {
+      case "unconfirmed":
+        return t.book.statusUnconfirmed;
+      case "confirmed":
+        return t.book.statusConfirmed;
+      case "apologized":
+        return t.book.statusApologized;
+      case "postponed":
+        return t.book.statusPostponed;
+      case "no_answer":
+        return t.book.statusNoAnswer;
+      default:
+        return t.book.statusUnknown;
+    }
+  }
+
+  function readLastAppointment(
+    data: Partial<PatientAppointmentsInfo> & {
+      lastAppointment?: LastAppointmentView | null;
+    },
+  ): LastAppointmentView | null {
+    const last = data.lastAppointment;
+    if (!last?.date) return null;
+    return {
+      date: last.date,
+      time: last.time ?? "",
+      status: last.status ?? "unknown",
+      clinic: last.clinic ?? "",
+      notes: last.notes ?? "",
+    };
   }
 
   async function loadAppointmentsForPatients(
@@ -165,6 +213,7 @@ export function BookingForm() {
           (await apptRes.json()) as Partial<PatientAppointmentsInfo> & {
             matchedFileId?: string | null;
             filesWithBooking?: string[];
+            lastAppointment?: LastAppointmentView | null;
             retry?: boolean;
           };
         if (seq !== lookupSeq.current) return;
@@ -190,6 +239,7 @@ export function BookingForm() {
     data: Partial<PatientAppointmentsInfo> & {
       matchedFileId?: string | null;
       filesWithBooking?: string[];
+      lastAppointment?: LastAppointmentView | null;
     },
   ) {
     const withBooking = list.filter((p) =>
@@ -199,11 +249,13 @@ export function BookingForm() {
       withBooking.find((p) => p.fileId === data.matchedFileId) ??
       withBooking[0] ??
       null;
+    const last = readLastAppointment(data);
 
     if (!data.hasAnyBooking || !matched) {
       apptLoadedForFileId.current = null;
       setPatients(list);
       setSelectedPatient(null);
+      setLastAppointment(null);
       setApptInfo({
         hasAnyBooking: false,
         hasUnconfirmedFuture: false,
@@ -223,6 +275,7 @@ export function BookingForm() {
     setNoBookingAfterLookup(false);
     setPatients(withBooking.length > 0 ? withBooking : list);
     setSelectedPatient(matched);
+    setLastAppointment(last);
     if (data.hideRetouch) {
       setSessionType("basic");
     }
@@ -298,6 +351,7 @@ export function BookingForm() {
           const data = (await res.json()) as Partial<PatientAppointmentsInfo> & {
             matchedFileId?: string | null;
             filesWithBooking?: string[];
+            lastAppointment?: LastAppointmentView | null;
             retry?: boolean;
           };
           if (seq !== apptSeq.current) return;
@@ -307,6 +361,7 @@ export function BookingForm() {
               if (data.hideRetouch) {
                 setSessionType("basic");
               }
+              setLastAppointment(readLastAppointment(data));
               setApptInfo({
                 hasAnyBooking: Boolean(data.hasAnyBooking),
                 hasUnconfirmedFuture: Boolean(data.hasUnconfirmedFuture),
@@ -469,6 +524,7 @@ export function BookingForm() {
     setPatients([]);
     setSelectedPatient(null);
     setApptInfo(null);
+    setLastAppointment(null);
     apptLoadedForFileId.current = null;
     setError("");
     setSuccess("");
@@ -513,6 +569,7 @@ export function BookingForm() {
               setSelectedPatient(null);
               setPatients([]);
               setFoundPatients([]);
+              setIntent(null);
               setNoFile(true);
               return;
             }
@@ -521,7 +578,7 @@ export function BookingForm() {
             setError("");
             setLookingUp(false);
             setFoundPatients(data.patients);
-            setPaymentOpen(true);
+            setIntent(null);
             return;
           }
         } catch {
@@ -741,13 +798,21 @@ export function BookingForm() {
   }
 
   const canBook =
+    intent === "book" &&
     Boolean(selectedPatient) &&
     !loadingAppts &&
     Boolean(apptInfo?.hasAnyBooking) &&
     paymentChoice === "paid";
   const showNoFile = noFile && !selectedPatient && !lookingUp;
+  const showIntentChoice =
+    foundPatients.length > 0 &&
+    intent === null &&
+    !paymentOpen &&
+    paymentChoice === null &&
+    !lookingUp &&
+    !noFile;
   const showNoBooking =
-    paymentChoice === "paid" &&
+    (paymentChoice === "paid" || intent === "my_appointment") &&
     (noBookingAfterLookup ||
       (Boolean(selectedPatient) &&
         !loadingAppts &&
@@ -756,12 +821,54 @@ export function BookingForm() {
   const showUnpaid =
     paymentChoice === "unpaid" && foundPatients.length > 0;
   const showCheckingBookings =
-    paymentChoice === "paid" &&
+    (paymentChoice === "paid" || intent === "my_appointment") &&
     ((lookingUp === false && loadingAppts) ||
       (Boolean(selectedPatient) && loadingAppts));
+  const showMyAppointment =
+    intent === "my_appointment" &&
+    !loadingAppts &&
+    Boolean(lastAppointment) &&
+    Boolean(apptInfo?.hasAnyBooking);
+  const previewPatient =
+    selectedPatient ??
+    (foundPatients.length === 1 ? foundPatients[0]! : null);
+
+  function onChooseBookNew() {
+    setIntent("book");
+    setPaymentOpen(true);
+  }
+
+  function onChooseMyAppointment() {
+    const list = foundPatients;
+    setIntent("my_appointment");
+    setPaymentChoice(null);
+    setPaymentOpen(false);
+    setError("");
+    setSuccess("");
+    const seq = lookupSeq.current;
+    void loadAppointmentsForPatients(list, seq);
+  }
+
+  function onBackToChoices() {
+    setIntent(null);
+    setPaymentOpen(false);
+    setPaymentChoice(null);
+    setSelectedPatient(null);
+    setPatients([]);
+    setApptInfo(null);
+    setLastAppointment(null);
+    setNoBookingAfterLookup(false);
+    setError("");
+    setSuccess("");
+    setConfirmOpen(false);
+    setAlreadyBookedOpen(false);
+    apptLoadedForFileId.current = null;
+    apptSeq.current += 1;
+  }
 
   function onPaymentPaid() {
     const list = foundPatients;
+    setIntent("book");
     setPaymentChoice("paid");
     setPaymentOpen(false);
     const seq = lookupSeq.current;
@@ -769,6 +876,7 @@ export function BookingForm() {
   }
 
   function onPaymentUnpaid() {
+    setIntent("book");
     setPaymentChoice("unpaid");
     setPaymentOpen(false);
   }
@@ -790,6 +898,7 @@ export function BookingForm() {
                 setSelectedPatient(null);
                 setPatients([]);
                 setApptInfo(null);
+                setLastAppointment(null);
                 apptLoadedForFileId.current = null;
                 setError("");
                 setSuccess("");
@@ -824,7 +933,56 @@ export function BookingForm() {
         </p>
       ) : null}
 
-      {patients.length > 1 && !selectedPatient ? (
+      {previewPatient ? (
+        <p className="booking-msg booking-msg--ok">
+          {t.book.fileFound}: <strong>{previewPatient.name}</strong>
+          <span className="booking-file-meta" dir="ltr">
+            {" "}
+            ({previewPatient.phoneOrId})
+          </span>
+        </p>
+      ) : showIntentChoice ? (
+        <p className="booking-msg booking-msg--ok">{t.book.fileFound}</p>
+      ) : null}
+
+      {showIntentChoice ? (
+        <div className="booking-intent">
+          <p className="booking-slots__label">{t.book.chooseAction}</p>
+          <div className="booking-intent__list">
+            <button
+              type="button"
+              className="booking-intent__btn btn btn--primary"
+              onClick={onChooseBookNew}
+              disabled={submitting}
+            >
+              {t.book.bookNew}
+            </button>
+            <button
+              type="button"
+              className="booking-intent__btn btn btn--ghost"
+              onClick={onChooseMyAppointment}
+              disabled={submitting}
+            >
+              {t.book.myAppointment}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {intent && !showIntentChoice && !paymentOpen ? (
+        <div className="booking-back">
+          <button
+            type="button"
+            className="btn btn--ghost"
+            onClick={onBackToChoices}
+            disabled={submitting || lookingUp}
+          >
+            {t.book.backToChoices}
+          </button>
+        </div>
+      ) : null}
+
+      {patients.length > 1 && !selectedPatient && intent ? (
         <div className="booking-patients">
           <p className="booking-slots__label">{t.book.chooseFile}</p>
           <div className="booking-patients__list">
@@ -839,6 +997,7 @@ export function BookingForm() {
                   if (apptLoadedForFileId.current !== p.fileId) {
                     apptLoadedForFileId.current = null;
                     setApptInfo(null);
+                    setLastAppointment(null);
                   }
                   setSelectedPatient(p);
                 }}
@@ -854,16 +1013,6 @@ export function BookingForm() {
         </div>
       ) : null}
 
-      {selectedPatient ? (
-        <p className="booking-msg booking-msg--ok">
-          {t.book.fileFound}: <strong>{selectedPatient.name}</strong>
-          <span className="booking-file-meta" dir="ltr">
-            {" "}
-            ({selectedPatient.phoneOrId})
-          </span>
-        </p>
-      ) : null}
-
       {showNoBooking ? (
         <p className="booking-msg booking-msg--error">
           {t.book.noBookingYet}{" "}
@@ -871,6 +1020,36 @@ export function BookingForm() {
             {site.phoneDisplay}
           </a>
         </p>
+      ) : null}
+
+      {showMyAppointment && lastAppointment ? (
+        <div className="booking-appointment">
+          <p className="booking-slots__label">{t.book.myAppointmentTitle}</p>
+          <dl className="booking-appointment__details">
+            <div>
+              <dt>{t.book.appointmentDate}</dt>
+              <dd dir="ltr">{lastAppointment.date}</dd>
+            </div>
+            <div>
+              <dt>{t.book.appointmentTime}</dt>
+              <dd dir="ltr">{lastAppointment.time || "—"}</dd>
+            </div>
+            <div>
+              <dt>{t.book.appointmentClinic}</dt>
+              <dd>{lastAppointment.clinic || "—"}</dd>
+            </div>
+            <div>
+              <dt>{t.book.appointmentStatus}</dt>
+              <dd>{statusLabel(lastAppointment.status)}</dd>
+            </div>
+            {lastAppointment.notes ? (
+              <div className="booking-appointment__notes">
+                <dt>{t.book.appointmentNotes}</dt>
+                <dd>{lastAppointment.notes}</dd>
+              </div>
+            ) : null}
+          </dl>
+        </div>
       ) : null}
 
       {showUnpaid ? (
@@ -883,7 +1062,11 @@ export function BookingForm() {
       ) : null}
 
       {showCheckingBookings ? (
-        <p className="booking-slots__status">{t.book.loadingSlots}</p>
+        <p className="booking-slots__status">
+          {intent === "my_appointment"
+            ? t.book.loadingAppointment
+            : t.book.loadingSlots}
+        </p>
       ) : null}
 
       {canBook ? (
@@ -1102,6 +1285,13 @@ export function BookingForm() {
                 {t.book.paymentPaid}
               </button>
             </div>
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={onBackToChoices}
+            >
+              {t.book.backToChoices}
+            </button>
           </div>
         </div>
       ) : null}

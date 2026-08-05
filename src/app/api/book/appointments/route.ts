@@ -3,6 +3,7 @@ import {
   findAppointmentsForPatient,
   hasUnconfirmedFutureBooking,
   isRetouchHiddenAfterConfirmedRetouch,
+  lastAppointment,
   lastBasicLaserBookingDate,
   lastBookingDate,
   basicMinDateAfter,
@@ -20,6 +21,7 @@ type Body = {
 };
 
 function summarize(appointments: ImdadAppointment[]) {
+  const last = lastAppointment(appointments);
   const lastDate = lastBookingDate(appointments);
   const basicLaserDate = lastBasicLaserBookingDate(appointments);
   const retouch = basicLaserDate ? retouchDateWindow(basicLaserDate) : null;
@@ -32,6 +34,15 @@ function summarize(appointments: ImdadAppointment[]) {
       clinic: a.clinic,
       notes: a.notes,
     })),
+    lastAppointment: last
+      ? {
+          date: last.date,
+          time: last.time,
+          status: last.status,
+          clinic: last.clinic,
+          notes: last.notes,
+        }
+      : null,
     hasAnyBooking: appointments.length > 0,
     hasUnconfirmedFuture: hasUnconfirmedFutureBooking(appointments),
     hideRetouch,

@@ -52,10 +52,27 @@ type Dictionary = {
     lookupFirst: string;
     fileFound: string;
     chooseFile: string;
+    chooseAction: string;
+    bookNew: string;
+    myAppointment: string;
+    myAppointmentTitle: string;
+    appointmentDate: string;
+    appointmentTime: string;
+    appointmentClinic: string;
+    appointmentStatus: string;
+    appointmentNotes: string;
+    statusUnconfirmed: string;
+    statusConfirmed: string;
+    statusApologized: string;
+    statusPostponed: string;
+    statusNoAnswer: string;
+    statusUnknown: string;
+    backToChoices: string;
     noFile: string;
     submit: string;
     submitting: string;
     loadingSlots: string;
+    loadingAppointment: string;
     noSlots: string;
     success: string;
     confirmNotice: string;
@@ -154,7 +171,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     book: {
       title: "احجز موعد الليزر",
       support:
-        "للحجز يجب أن يكون لديك ملف في العيادة. أدخل رقم الجوال أو الهوية الوطنية أولاً، ثم اختر الجهاز والفترة والوقت.",
+        "للحجز أو لعرض موعدك يجب أن يكون لديك ملف في العيادة. أدخل رقم الجوال أو الهوية الوطنية أولاً، ثم اختاري حجز جديد أو موعدي.",
       clinic: "العيادة / الجهاز",
       session: "الجلسة",
       sessionBasic: "أساسي",
@@ -174,11 +191,28 @@ const dictionaries: Record<Locale, Dictionary> = {
       lookupFirst: "تحقق من ملفك أولاً لتظهر المواعيد المتاحة.",
       fileFound: "تم العثور على ملفك",
       chooseFile: "اختر ملفك",
+      chooseAction: "ماذا تريدين؟",
+      bookNew: "حجز جديد",
+      myAppointment: "موعدي",
+      myAppointmentTitle: "آخر موعد لديك",
+      appointmentDate: "التاريخ",
+      appointmentTime: "الوقت",
+      appointmentClinic: "العيادة",
+      appointmentStatus: "الحالة",
+      appointmentNotes: "ملاحظات",
+      statusUnconfirmed: "غير مؤكد",
+      statusConfirmed: "مؤكد",
+      statusApologized: "اعتذار",
+      statusPostponed: "مؤجل",
+      statusNoAnswer: "لا يوجد رد",
+      statusUnknown: "غير معروف",
+      backToChoices: "رجوع",
       noFile:
         "لا يوجد ملف بهذا الرقم في نظام العيادة. فضلاً اتصلوا بالمجمع لفتح ملف جديد:",
       submit: "تأكيد الحجز",
       submitting: "جاري تأكيد الحجز، يرجى الانتظار...",
       loadingSlots: "جاري تحميل المواعيد المتاحة، يرجى الانتظار...",
+      loadingAppointment: "جاري تحميل موعدك، يرجى الانتظار...",
       noSlots: "لا توجد مواعيد بين ٤ م و ١٠ م في هذا اليوم. جرّب تاريخاً آخر.",
       success: "تم حجز موعدك بنجاح في نظام العيادة. نراكم قريباً.",
       confirmNotice:
@@ -321,7 +355,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     book: {
       title: "Book a laser appointment",
       support:
-        "You need an existing clinic file to book. Enter your mobile or national ID first, then choose the device, period, and time.",
+        "You need an existing clinic file to book or view your appointment. Enter your mobile or national ID first, then choose new booking or my appointment.",
       clinic: "Clinic / device",
       session: "Session",
       sessionBasic: "Basic",
@@ -341,11 +375,28 @@ const dictionaries: Record<Locale, Dictionary> = {
       lookupFirst: "Check your clinic file first to see available times.",
       fileFound: "File found",
       chooseFile: "Choose your file",
+      chooseAction: "What would you like to do?",
+      bookNew: "New booking",
+      myAppointment: "My appointment",
+      myAppointmentTitle: "Your last appointment",
+      appointmentDate: "Date",
+      appointmentTime: "Time",
+      appointmentClinic: "Clinic",
+      appointmentStatus: "Status",
+      appointmentNotes: "Notes",
+      statusUnconfirmed: "Unconfirmed",
+      statusConfirmed: "Confirmed",
+      statusApologized: "Cancelled",
+      statusPostponed: "Postponed",
+      statusNoAnswer: "No answer",
+      statusUnknown: "Unknown",
+      backToChoices: "Back",
       noFile:
         "No clinic file was found for this number. Please call the centre to open a new file:",
       submit: "Confirm booking",
       submitting: "Confirming booking, please wait...",
       loadingSlots: "Loading available times, please wait...",
+      loadingAppointment: "Loading your appointment, please wait...",
       noSlots: "No times between 4:00 PM and 10:00 PM on this day. Try another date.",
       success: "Your appointment was booked in the clinic system. See you soon.",
       confirmNotice:

@@ -433,17 +433,25 @@ export function isRetouchHiddenAfterConfirmedRetouch(
   return isRetouchSessionNote(last.notes) && last.status === "confirmed";
 }
 
-export function lastBookingDate(
+/** Newest usable appointment (excludes apologized / unknown). */
+export function lastAppointment(
   appointments: ImdadAppointment[],
-): string | null {
+): ImdadAppointment | null {
   const usable = appointments.filter(
     (a) => a.status !== "apologized" && a.status !== "unknown",
   );
   if (usable.length === 0) return null;
-  return usable.reduce(
-    (latest, a) => (a.date > latest ? a.date : latest),
-    usable[0]!.date,
-  );
+  return usable.reduce((best, a) => {
+    if (a.date > best.date) return a;
+    if (a.date === best.date && a.time > best.time) return a;
+    return best;
+  });
+}
+
+export function lastBookingDate(
+  appointments: ImdadAppointment[],
+): string | null {
+  return lastAppointment(appointments)?.date ?? null;
 }
 
 /**

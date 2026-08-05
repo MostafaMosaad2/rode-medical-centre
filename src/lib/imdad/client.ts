@@ -11,6 +11,7 @@ export type { ImdadAppointment } from "./appointments";
 export {
   hasUnconfirmedFutureBooking,
   isRetouchHiddenAfterConfirmedRetouch,
+  lastAppointment,
   lastBookingDate,
   lastBasicLaserBookingDate,
   retouchDateWindow,
