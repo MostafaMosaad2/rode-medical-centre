@@ -9,7 +9,7 @@ export const BASIC_MIN_DAYS_AFTER = 21;
 
 const LASER_CLINIC_RE = /ليزر|laser/i;
 const BASIC_NOTE_RE = /اساس|أساس|اساسي|أساسي/;
-const RETOUCH_NOTE_RE = /رتوش/;
+const RETOUCH_NOTE_RE = /رتوش|روتوش|retouch|rotosh/i;
 
 export type AppointmentStatus =
   | "unconfirmed"
@@ -31,7 +31,7 @@ export type ImdadAppointment = {
   clinic: string;
 };
 
-type SessionHelpers = {
+export type SessionHelpers = {
   login: () => Promise<string>;
   imdadFetch: (
     url: string,
@@ -312,6 +312,11 @@ export type FindAppointmentsInput = {
   /** IMDAD patient file id — used as st_id on appoint_display.php */
   fileId: string;
   phoneOrId?: string;
+  /**
+   * until-basic stops at the newest أساس note (booking date rules).
+   * all reads every laser card so session usage can be counted.
+   */
+  cards?: "until-basic" | "all";
 };
 
 /**
@@ -365,11 +370,18 @@ export async function findPatientAppointments(
     });
   }
 
-  // Enrich notes newest → oldest until we find أساس (anchors أساسي/رتوش rules)
-  const forCards = [...listed].sort((a, b) => b.date.localeCompare(a.date));
+  // Enrich notes newest → oldest until we find أساس (anchors أساسي/رتوش rules).
+  // Laser balance needs every laser card, so that path passes cards: "all".
+  const readAllCards = input.cards === "all";
+  const forCards = [...listed]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .filter((item) => {
+      if (!readAllCards) return true;
+      return !item.clinic.trim() || isLaserClinic(item.clinic);
+    });
   let foundBasic = false;
   for (const item of forCards) {
-    if (foundBasic) break;
+    if (!readAllCards && foundBasic) break;
     try {
       const card = await fetchCard(helpers, cookie, item.recId);
       cookie = card.cookie;

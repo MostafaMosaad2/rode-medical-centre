@@ -1,6 +1,10 @@
 import {
+  fetchPatientLaserPackage,
+} from "./invoices";
+import {
   findPatientAppointments,
   type ImdadAppointment,
+  type SessionHelpers,
 } from "./appointments";
 import { getImdadConfig } from "./config";
 import { isAllowedClinicId } from "./clinics";
@@ -689,10 +693,29 @@ export async function reserveAppointment(
     : new Error("Failed to reserve appointment");
 }
 
+function sessionHelpers(): SessionHelpers {
+  return {
+    login,
+    imdadFetch,
+    decodeHtml: decodeCp1256,
+    mergeCookieHeader,
+    parseSetCookie,
+    remember,
+    looksLikeLoginPage,
+    clearSession,
+  };
+}
+
+/** Paid laser invoice lines for a patient file. Never invents a session count. */
+export async function getPatientLaserPackage(fileId: string) {
+  return fetchPatientLaserPackage(sessionHelpers(), fileId);
+}
+
 /** Patient appointments via appoint_display.php?st_id={fileId}. */
 export async function findAppointmentsForPatient(input: {
   fileId: string;
   phoneOrId?: string;
+  cards?: "until-basic" | "all";
 }): Promise<ImdadAppointment[]> {
   const maxAttempts = 4;
   let lastError: unknown;
@@ -700,19 +723,7 @@ export async function findAppointmentsForPatient(input: {
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       clearSession();
-      return await findPatientAppointments(
-        {
-          login,
-          imdadFetch,
-          decodeHtml: decodeCp1256,
-          mergeCookieHeader,
-          parseSetCookie,
-          remember,
-          looksLikeLoginPage,
-          clearSession,
-        },
-        input,
-      );
+      return await findPatientAppointments(sessionHelpers(), input);
     } catch (err) {
       lastError = err;
       if (!isRetryableImdadError(err) || attempt === maxAttempts) {

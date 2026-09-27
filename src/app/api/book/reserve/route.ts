@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAllowedClinicId } from "@/lib/imdad/clinics";
 import {
-  findAppointmentsForPatient,
   hasUnconfirmedFutureBooking,
   isRetouchHiddenAfterConfirmedRetouch,
   lastBasicLaserBookingDate,
@@ -10,6 +9,10 @@ import {
   reserveAppointment,
   retouchDateWindow,
 } from "@/lib/imdad/client";
+import {
+  loadPatientLaserContext,
+  sessionBlockedByPackage,
+} from "@/lib/laser/status";
 import { site } from "@/lib/site";
 
 export const runtime = "nodejs";
@@ -66,10 +69,8 @@ export async function POST(request: Request) {
   try {
     const patient = patientFromToken(patientToken);
     if (patient) {
-      const appointments = await findAppointmentsForPatient({
-        fileId: patient.fileId,
-        phoneOrId: patient.phoneOrId,
-      });
+      const laser = await loadPatientLaserContext(patient.fileId);
+      const appointments = laser.appointments;
 
       if (appointments.length === 0) {
         return NextResponse.json(
@@ -151,6 +152,16 @@ export async function POST(request: Request) {
             { status: 409 },
           );
         }
+      }
+
+      if (sessionBlockedByPackage(laser, sessionType)) {
+        return NextResponse.json(
+          {
+            error: "No sessions of this type remain on the purchased package",
+            code: "PACKAGE_EXHAUSTED",
+          },
+          { status: 409 },
+        );
       }
     }
 

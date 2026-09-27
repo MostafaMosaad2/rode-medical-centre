@@ -11,6 +11,7 @@ import { userSafeError } from "@/lib/bookingErrors";
 import { hasHourAvailability } from "@/lib/imdad/hours";
 import { useI18n } from "@/lib/i18n";
 import { site } from "@/lib/site";
+import { LaserStatusCard, type LaserStatusView } from "@/components/LaserStatusCard";
 
 type ClinicOption = {
   id: string;
@@ -135,10 +136,13 @@ export function BookingForm() {
   const [lastAppointment, setLastAppointment] =
     useState<LastAppointmentView | null>(null);
   const [loadingAppts, setLoadingAppts] = useState(false);
+  const [laserStatus, setLaserStatus] = useState<LaserStatusView | null>(null);
+  const [loadingLaser, setLoadingLaser] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const lookupSeq = useRef(0);
   const apptSeq = useRef(0);
+  const laserSeq = useRef(0);
   const apptLoadedForFileId = useRef<string | null>(null);
 
   const needsHourSlot = HOUR_TREATMENTS.has(treatmentType);
@@ -390,6 +394,42 @@ export function BookingForm() {
   }, [selectedPatient]);
 
   useEffect(() => {
+    if (!selectedPatient) {
+      setLaserStatus(null);
+      setLoadingLaser(false);
+      return;
+    }
+    const fileId = selectedPatient.fileId;
+    const seq = ++laserSeq.current;
+    setLoadingLaser(true);
+    setLaserStatus(null);
+
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/patient/laser-status?fileId=${encodeURIComponent(fileId)}`,
+        );
+        if (seq !== laserSeq.current) return;
+        if (!res.ok) {
+          setLaserStatus(null);
+          return;
+        }
+        const data = (await res.json()) as LaserStatusView & { success?: boolean };
+        if (seq !== laserSeq.current) return;
+        if (data.success) setLaserStatus(data);
+      } catch {
+        if (seq === laserSeq.current) setLaserStatus(null);
+      } finally {
+        if (seq === laserSeq.current) setLoadingLaser(false);
+      }
+    })();
+
+    return () => {
+      laserSeq.current += 1;
+    };
+  }, [selectedPatient]);
+
+  useEffect(() => {
     if (apptInfo?.hideRetouch && sessionType === "retouch") {
       setSessionType("basic");
     }
@@ -614,6 +654,20 @@ export function BookingForm() {
       return;
     }
 
+    const sessionsLeft =
+      sessionType === "retouch"
+        ? laserStatus?.remaining?.retouch
+        : laserStatus?.remaining?.primary;
+    if (sessionsLeft === 0) {
+      showUserError(
+        undefined,
+        sessionType === "retouch"
+          ? t.book.errorRetouchFinished
+          : t.book.errorPrimaryFinished,
+      );
+      return;
+    }
+
     if (sessionType === "basic" && apptInfo?.basicMinDate) {
       if (date < apptInfo.basicMinDate) {
         showUserError(undefined, t.book.errorBasicDate);
@@ -772,6 +826,15 @@ export function BookingForm() {
           }
           if (data.code === "RETOUCH_DATE") {
             showUserError(undefined, t.book.errorRetouchDate);
+            return;
+          }
+          if (data.code === "PACKAGE_EXHAUSTED") {
+            showUserError(
+              undefined,
+              sessionType === "retouch"
+                ? t.book.errorRetouchFinished
+                : t.book.errorPrimaryFinished,
+            );
             return;
           }
           if (data.code === "SLOT_GONE") {
@@ -943,6 +1006,10 @@ export function BookingForm() {
         </p>
       ) : showIntentChoice ? (
         <p className="booking-msg booking-msg--ok">{t.book.fileFound}</p>
+      ) : null}
+
+      {selectedPatient ? (
+        <LaserStatusCard status={laserStatus} loading={loadingLaser} />
       ) : null}
 
       {showIntentChoice ? (

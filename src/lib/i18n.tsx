@@ -96,6 +96,26 @@ type Dictionary = {
     errorNoBasicLaser: string;
     errorRetouchDate: string;
     errorBasicDate: string;
+    laserTitle: string;
+    laserLoading: string;
+    laserUsed: string;
+    laserRemaining: string;
+    laserNext: string;
+    laserEligibleFrom: string;
+    laserEligibleUntil: string;
+    laserHistoryTitle: string;
+    laserPrimaryCompleted: string;
+    laserRetouchCompleted: string;
+    laserPackageUnavailable: string;
+    laserCountUnknown: string;
+    laserRetouchUnknown: string;
+    laserMultiple: string;
+    laserUnclassified: string;
+    laserFinished: string;
+    laserReview: string;
+    laserWait: string;
+    errorPrimaryFinished: string;
+    errorRetouchFinished: string;
   };
   home: {
     headline: string;
@@ -245,6 +265,26 @@ const dictionaries: Record<Locale, Dictionary> = {
         "جلسة الرتوش متاحة فقط خلال ٧ إلى 10 يوماً من تاريخ حجز الأساسي لليزر.",
       errorBasicDate:
         "جلسة الأساسي متاحة فقط بعد ٢١ يوماً من آخر حجز أساسي لليزر.",
+      laserTitle: "باقة الليزر",
+      laserLoading: "جاري تحميل حالة جلسات الليزر...",
+      laserUsed: "المستخدم",
+      laserRemaining: "المتبقي",
+      laserNext: "الجلسة التالية",
+      laserEligibleFrom: "متاحة من",
+      laserEligibleUntil: "حتى",
+      laserHistoryTitle: "سجل الليزر",
+      laserPrimaryCompleted: "الأساسي المكتمل",
+      laserRetouchCompleted: "الرتوش المكتمل",
+      laserPackageUnavailable: "رصيد الباقة غير متوفر من نظام العيادة.",
+      laserCountUnknown: "عدد الجلسات غير مذكور في الفاتورة.",
+      laserRetouchUnknown: "الفاتورة تشمل رتوشاً دون تحديد العدد.",
+      laserMultiple: "يوجد أكثر من باقة. لم يتم جمع الأرصدة معاً.",
+      laserUnclassified: "بعض المواعيد المؤكدة لم تُصنَّف، لذلك لم تُحتسب.",
+      laserFinished: "الباقة اكتملت",
+      laserReview: "تحتاج مراجعة يدوية",
+      laserWait: "انتظار",
+      errorPrimaryFinished: "لا توجد جلسات أساسي متبقية في الباقة.",
+      errorRetouchFinished: "لا توجد جلسات رتوش متبقية في الباقة.",
     },
     home: {
       headline: "جميع التخصصات الطبية تحت سقف واحد",
@@ -429,6 +469,30 @@ const dictionaries: Record<Locale, Dictionary> = {
         "Retouch sessions are only available 7 to 10 days after your basic laser booking.",
       errorBasicDate:
         "A basic session is only available 21 days after your last basic laser booking.",
+      laserTitle: "Laser package",
+      laserLoading: "Loading laser session status...",
+      laserUsed: "Used",
+      laserRemaining: "Remaining",
+      laserNext: "Next session",
+      laserEligibleFrom: "Eligible from",
+      laserEligibleUntil: "Until",
+      laserHistoryTitle: "Laser history",
+      laserPrimaryCompleted: "Primary completed",
+      laserRetouchCompleted: "Retouch completed",
+      laserPackageUnavailable: "Package balance unavailable from IMDAD.",
+      laserCountUnknown:
+        "The invoice does not state how many sessions were purchased.",
+      laserRetouchUnknown:
+        "The invoice includes retouch but does not state how many.",
+      laserMultiple:
+        "More than one laser package was found. Balances were not combined.",
+      laserUnclassified:
+        "Some confirmed appointments could not be classified and were not counted.",
+      laserFinished: "Package finished",
+      laserReview: "Manual review required",
+      laserWait: "Wait",
+      errorPrimaryFinished: "No primary sessions remain on this package.",
+      errorRetouchFinished: "No retouch sessions remain on this package.",
     },
     home: {
       headline: "Trusted medical & aesthetic care in Madinah",
