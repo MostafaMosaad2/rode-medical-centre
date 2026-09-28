@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test src/lib/laser/laser.test.ts"
+    "test": "tsx --test src/lib/laser/laser.test.ts src/lib/chatbot/chatbot.test.ts"
   },
   "dependencies": {
     "next": "16.2.11",

@@ -1,5 +1,6 @@
 "use client";
 
+import { ChatWidget } from "@/components/chatbot/ChatWidget";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ScrollBackdrop } from "@/components/ScrollBackdrop";
@@ -14,6 +15,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1">{children}</main>
         <Footer />
       </div>
+      <ChatWidget />
     </I18nProvider>
   );
 }
